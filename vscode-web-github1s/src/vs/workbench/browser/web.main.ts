@@ -65,6 +65,11 @@ import { IWorkspaceTrustEnablementService, IWorkspaceTrustManagementService } fr
 import { HTMLFileSystemProvider } from 'vs/platform/files/browser/htmlFileSystemProvider';
 import { IOpenerService } from 'vs/platform/opener/common/opener';
 import { safeStringify } from 'vs/base/common/objects';
+import { globals } from "vs/base/common/platform";
+import {
+	AutoSaveMode,
+	IFilesConfigurationService
+} from "vs/workbench/services/filesConfiguration/common/filesConfigurationService";
 
 class BrowserMain extends Disposable {
 
@@ -110,6 +115,13 @@ class BrowserMain extends Disposable {
 			const timerService = accessor.get(ITimerService);
 			const openerService = accessor.get(IOpenerService);
 			const productService = accessor.get(IProductService);
+			// below codes are changed by ByteLegend
+			// we need to disable autosave, otherwise the editor will immediately become undirty after change
+			const filesConfigurationService = accessor.get(IFilesConfigurationService);
+			if (filesConfigurationService.getAutoSaveMode() !== AutoSaveMode.OFF) {
+				filesConfigurationService.toggleAutoSave()
+			}
+			// above codes are changed by ByteLegend
 
 			return {
 				commands: {
@@ -393,11 +405,23 @@ class BrowserMain extends Disposable {
 export function main(domElement: HTMLElement, options: IWorkbenchConstructionOptions): Promise<IWorkbench> {
 	const workbench = new BrowserMain(domElement, options);
 
-	// below codes are changed by github1s
+	// below codes are changed by github1s and ByteLegend
 	return workbench.open().then(workbench => {
+		registerCommandForwarder(workbench)
 		// Remove the html load spinner
 		document.querySelector('#load-spinner')?.remove();
 		return workbench;
 	});
-	// above codes are changed by github1s
+	// above codes are changed by github1s and ByteLegend
 }
+
+// Below is changed by ByteLegend
+// This event listener listens to window.postMessage and forwards it to vscode command system
+function registerCommandForwarder(workbench: IWorkbench) {
+	globals.addEventListener('message', (message: MessageEvent) => {
+		if (message.data && message.data.forwardCommand) {
+			workbench.commands.executeCommand(message.data.forwardCommand.command, ...message.data.forwardCommand.args);
+		}
+	});
+}
+// Above is changed by ByteLegend
