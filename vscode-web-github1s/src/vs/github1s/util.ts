@@ -8,6 +8,10 @@ export const getBrowserUrl = (): string => {
 	return window.location.href;
 };
 
+export const getInitData = (): string => {
+	return document.getElementById('vscode-workbench-web-configuration')?.getAttribute('data-settings') || ''
+};
+
 export const replaceBrowserUrl = (url: string) => {
 	if (window.history.replaceState) {
 		window.history.replaceState(null, '', url);

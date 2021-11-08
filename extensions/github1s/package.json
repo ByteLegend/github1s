@@ -37,25 +37,18 @@
       ]
     },
     "views": {
-      "github1s": [
-        {
-          "id": "github1s.views.settings",
-          "name": "Settings",
-          "type": "webview"
-        }
-      ],
       "scm": [
         {
-          "id": "github1s.views.pull-request-list",
-          "name": "Pull Requests"
-        },
-        {
-          "id": "github1s.views.commit-list",
-          "name": "Commits"
+          "id": "bytelegend.views.my-answer-list",
+          "name": "My Answers"
         }
       ]
     },
     "commands": [
+      {
+        "command": "bytelegend.showLog",
+        "title": "Show Log"
+      },
       {
         "command": "github1s.dev-test",
         "title": "GitHub1s Dev Test",
@@ -349,6 +342,11 @@
         }
       ],
       "view/item/context": [
+        {
+          "command": "bytelegend.showLog",
+          "when": "viewItem == AnswerCommit",
+          "group": "inline@1"
+        },
         {
           "command": "github1s.pull-view-item-switch-to-pull",
           "when": "viewItem =~ /^github1s:pull-request$/",

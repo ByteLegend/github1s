@@ -20,7 +20,7 @@ import { isFolderToOpen, isWorkspaceToOpen } from 'vs/platform/windows/common/wi
 // below codes are changed by github1s
 import { create, ICredentialsProvider, IProductQualityChangeHandler, ISettingsSyncOptions, IURLCallbackProvider, IWindowIndicator, IWorkbenchConstructionOptions, IWorkspace, IWorkspaceProvider } from 'vs/workbench/workbench.web.api';
 // eslint-disable-next-line
-import { getBrowserUrl, replaceBrowserUrl } from 'vs/github1s/util';
+import { getBrowserUrl, getInitData, replaceBrowserUrl } from 'vs/github1s/util';
 // eslint-disable-next-line
 import { renderNotification } from 'vs/github1s/notification';
 // eslint-disable-next-line
@@ -38,6 +38,7 @@ const getGitHub1sCustomCommands: () => {
 	{ id: 'github1s.vscode.get-github-access-token', handler: getGitHubAccessToken },
 	{ id: 'github1s.vscode.get-github-access-token-with-overlay', handler: getGitHubAccessTokenWithOverlay },
 	{ id: 'github1s.vscode.hide-authorizing-overlay', handler: hideAuthorizingOverlay },
+	{ id: 'bytelegend.getInitData', handler: getInitData },
 ];
 // above codes are changed by github1s
 

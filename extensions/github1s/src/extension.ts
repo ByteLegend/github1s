@@ -15,6 +15,8 @@ import router from '@/router';
 import { activateSourceControl } from '@/source-control';
 import { registerEventListeners } from '@/listeners';
 import { PageType } from './router/types';
+import { byteLegendContext } from '@/bytelegend/bytelegendContext';
+import { registerByteLegendCommands } from '@/bytelegend/commands';
 
 export async function activate(context: vscode.ExtensionContext) {
 	const browserUrl = (await vscode.commands.executeCommand(
@@ -39,11 +41,17 @@ export async function activate(context: vscode.ExtensionContext) {
 	activateSourceControl();
 
 	// sponsors in Status Bar
-	showSponsors();
-	showGitpod();
+	// Below is changed by ByteLegend
+	// showSponsors();
+	// showGitpod();
+	// Above is changed by ByteLegend
 
 	// initialize the VSCode's state
 	initialVSCodeState();
+
+	// Below is changed by ByteLegend
+	registerByteLegendCommands();
+	// Above is changed by ByteLegend
 }
 
 // initialize the VSCode's state according to the router url

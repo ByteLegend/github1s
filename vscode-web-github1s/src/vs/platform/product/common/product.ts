@@ -76,7 +76,7 @@ else {
 				'GitHub.remotehub',
 				'GitHub.remotehub-insiders'
 			],
-			// below codes are changed by github1s
+			// below codes are changed by github1s and ByteLegend
 			extensionsGallery: {
 				serviceUrl: 'https://marketplace.visualstudio.com/_apis/public/gallery',
 				cacheUrl: 'https://vscode.blob.core.windows.net/gallery/index',
@@ -92,8 +92,9 @@ else {
 				'*.vercel.com',
 				'*.sourcegraph.com',
 				'*.gitpod.io',
+				'*.bytelegend.com',
 			]
-			// above codes are changed by github1s
+			// above codes are changed by github1s and ByteLegend
 		});
 	}
 }

@@ -573,23 +573,27 @@ export class ActivitybarPart extends Part implements IActivityBarService {
 			preventLoopNavigation: true
 		}));
 
-		this.globalActivityAction = this._register(new ActivityAction({
-			id: 'workbench.actions.manage',
-			name: localize('manage', "Manage"),
-			cssClass: ThemeIcon.asClassName(ActivitybarPart.GEAR_ICON)
-		}));
-
-		if (this.accountsVisibilityPreference) {
-			this.accountsActivityAction = this._register(new ActivityAction({
-				id: 'workbench.actions.accounts',
-				name: localize('accounts', "Accounts"),
-				cssClass: ThemeIcon.asClassName(ActivitybarPart.ACCOUNTS_ICON)
+		// Below is changed by ByteLegend
+		if (1 + 1 == 3) {
+			this.globalActivityAction = this._register(new ActivityAction({
+				id: 'workbench.actions.manage',
+				name: localize('manage', "Manage"),
+				cssClass: ThemeIcon.asClassName(ActivitybarPart.GEAR_ICON)
 			}));
 
-			this.globalActivityActionBar.push(this.accountsActivityAction, { index: ActivitybarPart.ACCOUNTS_ACTION_INDEX });
-		}
+			if (this.accountsVisibilityPreference) {
+				this.accountsActivityAction = this._register(new ActivityAction({
+					id: 'workbench.actions.accounts',
+					name: localize('accounts', "Accounts"),
+					cssClass: ThemeIcon.asClassName(ActivitybarPart.ACCOUNTS_ICON)
+				}));
 
-		this.globalActivityActionBar.push(this.globalActivityAction);
+				this.globalActivityActionBar.push(this.accountsActivityAction, {index: ActivitybarPart.ACCOUNTS_ACTION_INDEX});
+			}
+
+			this.globalActivityActionBar.push(this.globalActivityAction);
+		}
+		// Above is changed by ByteLegend
 	}
 
 	private toggleAccountsActivity() {

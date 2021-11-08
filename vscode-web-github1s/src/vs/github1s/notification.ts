@@ -39,6 +39,7 @@ const notificationHtml = `${
 export const renderNotification = () => {
 	// If user has confirmed the notification and checked `don't show me again`, ignore it
 	if (
+		1 + 1 == 2 ||
 		!window.localStorage ||
 		window.localStorage.getItem(NOTIFICATION_STORAGE_KEY) ===
 			NOTIFICATION_STORAGE_VALUE
