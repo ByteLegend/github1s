@@ -3,3 +3,6 @@ lib
 dist
 out
 node_modules
+.idea
+.yalc
+*.log
