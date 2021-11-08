@@ -41,7 +41,7 @@ export const registerVSCodeProviders = () => {
 		vscode.workspace.registerFileSystemProvider(
 			GitHub1sFileSystemProvider.scheme,
 			fileSystemProvider,
-			{ isCaseSensitive: true, isReadonly: true }
+			{ isCaseSensitive: true, isReadonly: false }
 		),
 		vscode.workspace.registerFileSearchProvider(
 			GitHub1sFileSearchProvider.scheme,
