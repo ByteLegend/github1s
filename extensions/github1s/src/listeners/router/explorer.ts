@@ -54,7 +54,11 @@ export const explorerRouterListener = (
 			'workbench.files.action.refreshFilesExplorer'
 		);
 		// TODO: maybe we should update the editors but not close it
-		vscode.commands.executeCommand('workbench.action.closeAllGroups');
+		// below is changed by ByteLegend
+		// When user submit new answer, we switch branch but don't want to close the editor
+		// maybe we should use if(previousState==main && currentState.match(/gh/.*/.*/))
+		// vscode.commands.executeCommand('workbench.action.closeAllGroups');
+		// above is changed by ByteLegend
 
 		changedFileDecorationProvider.updateDecorations();
 		submoduleDecorationProvider.updateDecorations();
