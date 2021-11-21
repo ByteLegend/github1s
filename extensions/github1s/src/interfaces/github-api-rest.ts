@@ -8,9 +8,9 @@ import { encodeFilePath } from '@/helpers/util';
 import {
 	fetch,
 	RequestError,
-	RequestRateLimitError,
 	RequestInvalidTokenError,
 	RequestNotFoundError,
+	RequestRateLimitError,
 	throttledReportNetworkError,
 } from '@/helpers/fetch';
 
@@ -18,6 +18,20 @@ export interface UriState {
 	owner: string;
 	repo: string;
 	path: string;
+}
+
+let apiServer = '';
+
+export async function getApiServer() {
+	if (apiServer == '') {
+		const initData: any = await vscode.commands.executeCommand(
+			'bytelegend.getInitData'
+		);
+		apiServer = initData
+			? `${initData.apiServer}/ghapi`
+			: 'https://api.github.com';
+	}
+	return apiServer;
 }
 
 const handleFileSystemRequestError = (error: RequestError) => {
@@ -56,24 +70,24 @@ export const readGitHubDirectory = async (
 		return cached;
 	}
 	return fetch(
-		`https://api.github.com/repos/${owner}/${repo}/git/trees/${ref}${encodeFilePath(
+		`${await getApiServer()}/repos/${owner}/${repo}/git/trees/${ref}${encodeFilePath(
 			path
 		).replace(/^\//, ':')}`,
 		options
 	).catch(handleFileSystemRequestError);
 };
 
-export const readGitHubFile = (
+export async function readGitHubFile(
 	owner: string,
 	repo: string,
 	fileSha: string,
 	options?: RequestInit
-) => {
+) {
 	return fetch(
-		`https://api.github.com/repos/${owner}/${repo}/git/blobs/${fileSha}`,
+		`${await getApiServer()}/repos/${owner}/${repo}/git/blobs/${fileSha}`,
 		options
 	).catch(handleFileSystemRequestError);
-};
+}
 
 export const validateToken = (token: string) => {
 	const authHeaders = token ? { Authorization: `token ${token}` } : {};
@@ -97,34 +111,34 @@ export const validateToken = (token: string) => {
 // [List matching references](https://docs.github.com/en/rest/reference/git#list-matching-references)
 // can returned all branches for a request, and there is an issue for this API
 // https://github.com/github/docs/issues/3863
-export const getGitHubBranchRefs = (
+export async function getGitHubBranchRefs(
 	owner: string,
 	repo: string,
 	options?: RequestInit
-) => {
+) {
 	return fetch(
-		`https://api.github.com/repos/${owner}/${repo}/git/matching-refs/heads`,
+		`${await getApiServer()}/repos/${owner}/${repo}/git/matching-refs/heads`,
 		options
 	).then((branchRefs) => {
 		// the field in branchRef will looks like `refs/heads/<branch>`, we add a name field here
 		return branchRefs.map((item) => ({ ...item, name: item.ref.slice(11) }));
 	});
-};
+}
 
 // It's similar to `getGithubBranchRefs`
-export const getGitHubTagRefs = (
+export async function getGitHubTagRefs(
 	owner: string,
 	repo: string,
 	options?: RequestInit
-) => {
+) {
 	return fetch(
-		`https://api.github.com/repos/${owner}/${repo}/git/matching-refs/tags`,
+		`${await getApiServer()}/repos/${owner}/${repo}/git/matching-refs/tags`,
 		options
 	).then((tagRefs) => {
 		// the field in tagRef will looks like `refs/tags/<tag>`, we add a name field here
 		return tagRefs.map((item) => ({ ...item, name: item.ref.slice(10) }));
 	});
-};
+}
 
 export const getGitHubAllFiles = async (
 	owner: string,
@@ -133,7 +147,7 @@ export const getGitHubAllFiles = async (
 	path: string = '/'
 ) => {
 	const ret = await fetch(
-		`https://api.github.com/repos/${owner}/${repo}/git/trees/${ref}${encodeFilePath(
+		`${await getApiServer()}/repos/${owner}/${repo}/git/trees/${ref}${encodeFilePath(
 			path
 		).replace(/^\//, ':')}?recursive=1`
 	).catch(handleFileSystemRequestError);
@@ -143,83 +157,83 @@ export const getGitHubAllFiles = async (
 	return ret;
 };
 
-export const getGitHubPulls = (
+export async function getGitHubPulls(
 	owner: string,
 	repo: string,
 	pageNumber = 0,
 	pageSize = 100,
 	options?: RequestInit
-) => {
+) {
 	// TODO: only recent 100 pull requests are supported now
 	return fetch(
-		`https://api.github.com/repos/${owner}/${repo}/pulls?state=all&order=created&per_page=${pageSize}&page=${pageNumber}`,
+		`${await getApiServer()}/repos/${owner}/${repo}/pulls?state=all&order=created&per_page=${pageSize}&page=${pageNumber}`,
 		options
 	);
-};
+}
 
-export const getGitHubPullDetail = (
+export async function getGitHubPullDetail(
 	owner: string,
 	repo: string,
 	pullNumber: number,
 	options?: RequestInit
-) => {
+) {
 	return fetch(
-		`https://api.github.com/repos/${owner}/${repo}/pulls/${pullNumber}`,
+		`${await getApiServer()}/repos/${owner}/${repo}/pulls/${pullNumber}`,
 		options
 	);
-};
+}
 
-export const getGitHubPullFiles = (
+export async function getGitHubPullFiles(
 	owner: string,
 	repo: string,
 	pullNumber: number,
 	options?: RequestInit
-) => {
+) {
 	// TODO: only the number of change files not greater than 100 are supported now!
 	return fetch(
-		`https://api.github.com/repos/${owner}/${repo}/pulls/${pullNumber}/files?per_page=100`,
+		`${await getApiServer()}/repos/${owner}/${repo}/pulls/${pullNumber}/files?per_page=100`,
 		options
 	);
-};
+}
 
-export const getGitHubCommits = (
+export async function getGitHubCommits(
 	owner: string,
 	repo: string,
 	sha: string,
 	pageNumber = 0,
 	pageSize = 100,
 	options?: ResponseInit
-) => {
+) {
 	return fetch(
-		`https://api.github.com/repos/${owner}/${repo}/commits?sha=${sha}&per_page=${pageSize}&page=${pageNumber}`,
+		`${await getApiServer()}/repos/${owner}/${repo}/commits?sha=${sha}&per_page=${pageSize}&page=${pageNumber}`,
 		options
 	);
-};
+}
 
-export const getGitHubFileCommits = (
+export async function getGitHubFileCommits(
 	owner: string,
 	repo: string,
 	filePath: string,
 	sha: string,
 	options?: ResponseInit
-) => {
+) {
 	return fetch(
-		`https://api.github.com/repos/${owner}/${repo}/commits?path=${filePath.slice(1)}&sha=${sha}&per_page=100`, // prettier-ignore
+		`${await getApiServer()}/repos/${owner}/${repo}/commits?path=${filePath.slice(1)}&sha=${sha}&per_page=100`, // prettier-ignore
 		options
 	);
-};
+}
 
-export const getGitHubCommitDetail = (
+export async function getGitHubCommitDetail(
 	owner: string,
 	repo: string,
 	commitSha: string,
 	options?: RequestInit
-) => {
+) {
 	return fetch(
-		`https://api.github.com/repos/${owner}/${repo}/commits/${commitSha}`,
+		`${await getApiServer()}/repos/${owner}/${repo}/commits/${commitSha}`,
 		options
 	);
-};
+}
 
 const repoFileTreeCacheKey = (owner: string, repo: string, ref: string) => {
 	return `${owner}/${repo}/${ref}`;
