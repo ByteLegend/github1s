@@ -17,7 +17,7 @@
 		<link rel="preload" href="/static/{STATIC_HASH_CODE}/vscode/vs/workbench/workbench.web.api.css" as="style">
 		<link rel="preload" href="/static/{STATIC_HASH_CODE}/vscode/vs/code/browser/workbench/workbench.css" as="style">
 		<link rel="manifest" href="/manifest.json" />
-		<title>GitHub1s</title>
+		<title>ByteLegend Web Editor</title>
 		<style>
 			#load-spinner {
 				position: absolute;
@@ -114,6 +114,22 @@
 			}
 		</style>
 	</head>
+
+	<script>
+		window.addEventListener('message', function (message) {
+			if (message.data && message.data.bytelegendInitData) {
+				console.log(`
+					Received init data:
+					latestOpenPullRequest: ${message.data.bytelegendInitData.latestOpenPullRequest}
+					missionId: ${message.data.bytelegendInitData.missionId}
+					challengeId: ${message.data.bytelegendInitData.challengeId}
+					whitelist: ${JSON.stringify(message.data.bytelegendInitData.whitelist)}
+					answers: ${JSON.stringify(message.data.bytelegendInitData.answers)}
+					`)
+				window.bytelegendInitData = message.data.bytelegendInitData;
+			}
+		});
+	</script>
 
 	<body aria-label="">
 		<noscript title="No JavaScript Support">

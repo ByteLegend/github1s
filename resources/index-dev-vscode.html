@@ -15,8 +15,24 @@
 		<link rel="icon" media="(prefers-color-scheme:light)" href="/favicon-light.svg" type="image/svg+xml">
 		<link rel="icon" media="(prefers-color-scheme:dark)" href="/favicon-dark.svg" type="image/svg+xml">
 		<link rel="manifest" href="/manifest.json" />
-		<title>GitHub1s</title>
+		<title>ByteLegend Web Editor</title>
 	</head>
+
+	<script>
+		window.addEventListener('message', function (message) {
+			if (message.data && message.data.bytelegendInitData) {
+				console.log(`
+					Received init data:
+					latestOpenPullRequest: ${message.data.bytelegendInitData.latestOpenPullRequest}
+					missionId: ${message.data.bytelegendInitData.missionId}
+					challengeId: ${message.data.bytelegendInitData.challengeId}
+					whitelist: ${JSON.stringify(message.data.bytelegendInitData.whitelist)}
+					answers: ${JSON.stringify(message.data.bytelegendInitData.answers)}
+					`)
+				window.bytelegendInitData = message.data.bytelegendInitData;
+			}
+		});
+	</script>
 
 	<body aria-label="">
 		<noscript title="No JavaScript Support">
