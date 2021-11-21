@@ -8,9 +8,17 @@ export const getBrowserUrl = (): string => {
 	return window.location.href;
 };
 
-export const getInitData = (): string => {
-	return document.getElementById('vscode-workbench-web-configuration')?.getAttribute('data-settings') || ''
+export const getInitData = (): any => {
+	return (<any>window).bytelegendInitData
 };
+
+export const isTerminalVisible = (): boolean => {
+	return document.querySelectorAll(".xterm-viewport").length != 0
+}
+
+export const postMessageToParentWindow = (message: any) => {
+	return window.parent?.postMessage(message, '*')
+}
 
 export const replaceBrowserUrl = (url: string) => {
 	if (window.history.replaceState) {
