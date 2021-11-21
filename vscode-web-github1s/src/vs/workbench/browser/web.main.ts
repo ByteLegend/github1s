@@ -420,7 +420,7 @@ export function main(domElement: HTMLElement, options: IWorkbenchConstructionOpt
 function registerCommandForwarder(workbench: IWorkbench) {
 	globals.addEventListener('message', (message: MessageEvent) => {
 		if (message.data && message.data.forwardCommand) {
-			workbench.commands.executeCommand(message.data.forwardCommand.command, ...message.data.forwardCommand.args);
+			workbench.commands.executeCommand(message.data.forwardCommand, ...message.data.forwardCommandArgs);
 		}
 	});
 }
