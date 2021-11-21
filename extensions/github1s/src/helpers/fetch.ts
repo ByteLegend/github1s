@@ -59,7 +59,13 @@ export const getFetchOptions = (forceUpdate?: boolean): RequestInit => {
 
 const cache = new Map();
 
-const isGitHubApi = (url: string) => url.startsWith('https://api.github.com/');
+function isGitHubApi(url: string) {
+	return (
+		url.startsWith('https://api.github.com/') ||
+		url.startsWith('http://localhost:8080/ghapi/') ||
+		url.startsWith('https://bytelegend.com/ghapi/')
+	);
+}
 
 export const fetch = reuseable(async (url: string, options?: RequestInit) => {
 	const token = getOAuthToken();
