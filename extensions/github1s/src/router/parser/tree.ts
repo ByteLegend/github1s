@@ -21,6 +21,14 @@ const findMatchedBranchOrTag = (
 		}
 		maybeBranch = `${maybeBranch}/${pathParts[++partIndex]}`;
 	}
+	// below is changed by ByteLegend
+	// After user submits answers, we create a gh/{userGitHubName}/{timestamp} branch
+	// But unfortunately, this branch might not be visible immediately, so we have
+	// to forcibly detect it as a branch.
+	if (pathParts[3] == 'gh') {
+		return `${pathParts[3]}/${pathParts[4]}/${pathParts[5]}`;
+	}
+	// above is changed by ByteLegend
 	return null;
 };
 
