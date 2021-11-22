@@ -17,6 +17,7 @@ import { registerEventListeners } from '@/listeners';
 import { PageType } from './router/types';
 import { byteLegendContext } from '@/bytelegend/bytelegendContext';
 import { registerByteLegendCommands } from '@/bytelegend/commands';
+import { getApiServer } from '@/interfaces/github-api-rest';
 
 export async function activate(context: vscode.ExtensionContext) {
 	const browserUrl = (await vscode.commands.executeCommand(
@@ -51,11 +52,12 @@ export async function activate(context: vscode.ExtensionContext) {
 
 	// Below is changed by ByteLegend
 	registerByteLegendCommands();
+	await byteLegendContext.init();
 	// Above is changed by ByteLegend
 }
 
 // initialize the VSCode's state according to the router url
-const initialVSCodeState = async () => {
+export const initialVSCodeState = async () => {
 	const routerState = await router.getState();
 	const { filePath, pageType } = routerState;
 	const scheme = GitHub1sFileSystemProvider.scheme;

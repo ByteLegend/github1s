@@ -100,10 +100,6 @@ const commands: { id: string; callback: (...args: any[]) => any }[] = [
 
 	// toggle the gutter blame of a editor
 	{ id: 'github1s.toggle-editor-gutter-blame', callback: commandToggleEditorGutterBlame }, // prettier-ignore
-	// open the gutter blame of a editor
-	{ id: 'github1s.open-editor-gutter-blame', callback: commandOpenEditorGutterBlame }, // prettier-ignore
-	// close the gutter blame of a editor
-	{ id: 'github1s.close-editor-gutter-blame', callback: commandCloseEditorGutterBlame }, // prettier-ignore
 
 	// open current page on GitHub
 	{ id: 'github1s.open-on-github', callback: commandOpenOnGitHub },

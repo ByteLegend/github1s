@@ -1,13 +1,14 @@
 import * as vscode from 'vscode';
+import { TreeItem } from 'vscode';
 import { getExtensionContext } from '@/helpers/context';
 import { PullRequestAnswer } from '@/bytelegend/entities';
-import { byteLegendContext } from '@/bytelegend/context';
-import { TreeItem } from 'vscode';
+import { byteLegendContext } from '@/bytelegend/bytelegendContext';
 
 const commands: { id: string; callback: (...args: any[]) => any }[] = [
-	{ id: 'bytelegend.updateMyAnswers', callback: updateMyAnswers },
+	{ id: 'bytelegend.updateAnswers', callback: updateAnswers },
 	{ id: 'bytelegend.log', callback: log },
-	{ id: 'bytelegend.showLog', callback: showLog },
+	{ id: 'bytelegend.showAnswerLog', callback: showAnswerLog },
+	{ id: 'bytelegend.openOnGitHub', callback: openOnGitHub },
 	{ id: 'bytelegend.appendLog', callback: appendLog },
 	{ id: 'bytelegend.submitAnswer', callback: submitAnswer },
 ];
@@ -22,12 +23,36 @@ export const registerByteLegendCommands = () => {
 	);
 };
 
-async function updateMyAnswers(answers: any[]) {
-	await byteLegendContext.updateAnswers(
-		answers.map((answer) => {
-			return PullRequestAnswer.fromJSON(answer);
-		})
-	);
+async function open(url: string): Promise<void> {
+	await vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(url));
+}
+
+async function openOnGitHub(treeItem: TreeItem) {
+	if (treeItem.id.startsWith('https')) {
+		await runCatching(open(treeItem.id));
+	} else {
+		// should be commit id
+		const commitId = treeItem.id;
+		const prAnswerId = (
+			await byteLegendContext.answerTreeDataProvider.getParent(treeItem)
+		).id;
+		const prAnswer = byteLegendContext.answerTreeDataProvider.getNodeById(
+			prAnswerId
+		) as PullRequestAnswer;
+		await runCatching(
+			open(
+				`https://github.com/${prAnswer.headRepoFullName}/commit/${treeItem.id}`
+			)
+		);
+	}
+}
+
+async function showAnswerLog(nodeId: string) {
+	await runCatching(byteLegendContext.showAnswerLog(nodeId));
+}
+
+async function updateAnswers(answers: any[]) {
+	await runCatching(byteLegendContext.updateAnswers(answers));
 }
 
 function log(message: string) {
@@ -35,27 +60,18 @@ function log(message: string) {
 }
 
 async function submitAnswer() {
-	const initData = await vscode.commands.executeCommand(
-		'bytelegend.getInitData'
-	);
-
-	console.log(initData);
-
-	await byteLegendContext.submitAnswer();
+	await runCatching(byteLegendContext.submitAnswer());
 }
 
 async function appendLog(checkRunId: any, lines: string[]) {
-	await byteLegendContext.appendLog(checkRunId.toString(), lines);
+	await runCatching(byteLegendContext.appendLog(checkRunId.toString(), lines));
 }
 
-function showLog(treeItem: TreeItem) {
-	console.log(treeItem);
-	// byteLegendContext.showLog(checkRunId);
-	// try {
-	// 	vscode.commands.executeCommand('workbench.action.terminal.toggleTerminal');
-	// vscode.window.createTerminal('test').sendText('111\r\n222\r\n333\r\n');
-	// 	// vscode.window.activeTerminal.sendText('1\n2\n3\n');
-	// } catch (e) {
-	// 	console.trace(e);
-	// }
+export async function runCatching<T>(promise: Promise<T>): Promise<any[]> {
+	return promise
+		.then((data) => [null, data])
+		.catch((err) => {
+			console.trace(err);
+			return [err];
+		});
 }

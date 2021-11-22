@@ -3,6 +3,7 @@
  */
 
 import * as vscode from 'vscode';
+import { TreeItemCollapsibleState } from 'vscode';
 import { getExtensionContext } from '@/helpers/context';
 import { SettingsView } from './settings-view';
 import { PullRequestTreeDataProvider } from './pull-list-view';
@@ -16,6 +17,19 @@ export const pullRequestTreeDataProvider = new PullRequestTreeDataProvider();
 export const registerCustomViews = () => {
 	const context = getExtensionContext();
 
+	const myAnswerTreeView = vscode.window.createTreeView(
+		MyAnswerTreeDataProvider.viewId,
+		{
+			treeDataProvider: byteLegendContext.answerTreeDataProvider,
+		}
+	);
+	myAnswerTreeView.onDidChangeSelection((e) => {
+		const oldState = e.selection[0].collapsibleState;
+		if (oldState == TreeItemCollapsibleState.Collapsed) {
+			myAnswerTreeView.reveal(e.selection[0], { expand: true });
+		}
+	});
+
 	context.subscriptions.push(
 		// register settings view
 		vscode.window.registerWebviewViewProvider(
@@ -23,10 +37,7 @@ export const registerCustomViews = () => {
 			new SettingsView()
 		),
 		// Below is changed by ByteLegend
-		vscode.window.registerTreeDataProvider(
-			MyAnswerTreeDataProvider.viewId,
-			byteLegendContext.answerTreeDataProvider
-		)
+		myAnswerTreeView
 
 		// // register pull request view which is in source control panel
 		// vscode.window.registerTreeDataProvider(
