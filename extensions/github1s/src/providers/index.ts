@@ -57,18 +57,18 @@ export const registerVSCodeProviders = () => {
 			sourceControlDecorationProvider
 		),
 
-		vscode.languages.registerDefinitionProvider(
-			{ scheme: GitHub1sDefinitionProvider.scheme },
-			definitionProvider
-		),
-		vscode.languages.registerReferenceProvider(
-			{ scheme: GitHub1sReferenceProvider.scheme },
-			referenceProvider
-		),
-		vscode.languages.registerHoverProvider(
-			{ scheme: GitHub1sHoverProvider.scheme },
-			hoverProvider
-		),
+		// vscode.languages.registerDefinitionProvider(
+		// 	{ scheme: GitHub1sDefinitionProvider.scheme },
+		// 	definitionProvider
+		// ),
+		// vscode.languages.registerReferenceProvider(
+		// 	{ scheme: GitHub1sReferenceProvider.scheme },
+		// 	referenceProvider
+		// ),
+		// vscode.languages.registerHoverProvider(
+		// 	{ scheme: GitHub1sHoverProvider.scheme },
+		// 	hoverProvider
+		// ),
 
 		// provider a readonly empty file for diff
 		vscode.workspace.registerTextDocumentContentProvider(EMPTY_FILE_SCHEME, {
