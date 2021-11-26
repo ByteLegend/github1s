@@ -62,7 +62,7 @@ const cache = new Map();
 function isGitHubApi(url: string) {
 	return (
 		url.startsWith('https://api.github.com/') ||
-		url.startsWith('http://localhost:8080/ghapi/') ||
+		new RegExp('http://localhost:\\d+/ghapi/').test(url) ||
 		url.startsWith('https://bytelegend.com/ghapi/')
 	);
 }
