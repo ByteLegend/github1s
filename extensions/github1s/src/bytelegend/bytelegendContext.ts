@@ -29,7 +29,7 @@ export class ByteLegendContext {
 		await vscode.commands.executeCommand(
 			'bytelegend.postMessageToParentWindow',
 			{
-				bytelegendEvent: 'webditor.init.completed',
+				bytelegendEvent: 'webeditor.init.completed',
 			}
 		);
 		if (this._initData) {
