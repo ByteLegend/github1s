@@ -11,13 +11,13 @@ function main() {
 		if [ -f "$entry/package.json" ]
 		then
 			cd $entry
-			yarn --frozen-lockfile
+			yarn
 		fi
 	done
 
 	# install dependencies for the @github1s/vscode-web
 	cd "${APP_ROOT}/vscode-web-github1s"
-	yarn --frozen-lockfile
+	yarn
 }
 
 main "$@"
