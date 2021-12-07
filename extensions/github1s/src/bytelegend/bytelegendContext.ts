@@ -3,9 +3,9 @@ import { MyAnswerTreeDataProvider } from '@/bytelegend/my-answer-list-view';
 import * as vscode from 'vscode';
 import { TreeItem } from 'vscode';
 import { ByteLegendLogManager } from '@/bytelegend/bytelegendLogManager';
-import { runCatching } from '@/bytelegend/commands';
 import router from '@/router';
 import { initialVSCodeState } from '@/extension';
+import { runCatching } from '@/bytelegend/utils';
 
 /**
  * Router states:
@@ -219,12 +219,6 @@ export class ByteLegendContext {
 		return (
 			this.answerTreeDataProvider.getNodeByCheckRunId(logId)?.title || logId
 		);
-	}
-
-	async sleep(ms: number): Promise<void> {
-		return new Promise((resolve) => {
-			setTimeout(resolve, ms);
-		});
 	}
 
 	private static async setSubmitAnswerButton(

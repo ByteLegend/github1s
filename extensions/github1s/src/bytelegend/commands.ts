@@ -3,6 +3,7 @@ import { TreeItem } from 'vscode';
 import { getExtensionContext } from '@/helpers/context';
 import { PullRequestAnswer } from '@/bytelegend/entities';
 import { byteLegendContext } from '@/bytelegend/bytelegendContext';
+import { runCatching } from '@/bytelegend/utils';
 
 const commands: { id: string; callback: (...args: any[]) => any }[] = [
 	{ id: 'bytelegend.updateAnswers', callback: updateAnswers },
@@ -65,13 +66,4 @@ async function submitAnswer() {
 
 async function appendLog(checkRunId: any, lines: string[]) {
 	await runCatching(byteLegendContext.appendLog(checkRunId.toString(), lines));
-}
-
-export async function runCatching<T>(promise: Promise<T>): Promise<any[]> {
-	return promise
-		.then((data) => [null, data])
-		.catch((err) => {
-			console.trace(err);
-			return [err];
-		});
 }

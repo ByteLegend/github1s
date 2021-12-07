@@ -18,6 +18,7 @@ import { PageType } from './router/types';
 import { byteLegendContext } from '@/bytelegend/bytelegendContext';
 import { registerByteLegendCommands } from '@/bytelegend/commands';
 import { getApiServer } from '@/interfaces/github-api-rest';
+import { sleep } from '@/bytelegend/utils';
 
 export async function activate(context: vscode.ExtensionContext) {
 	const browserUrl = (await vscode.commands.executeCommand(
@@ -53,7 +54,36 @@ export async function activate(context: vscode.ExtensionContext) {
 	// Below is changed by ByteLegend
 	registerByteLegendCommands();
 	await byteLegendContext.init();
+	vscode.workspace.onDidOpenTextDocument((doc) => {
+		console.log(`${doc.uri}: ${doc.languageId}`);
+		if (doc && doc.languageId === 'markdown') {
+			openMarkdownPreview(doc.uri.toString().substring('github1s:'.length));
+		}
+	});
 	// Above is changed by ByteLegend
+}
+
+async function openMarkdownPreview(docFilePath: string) {
+	const deadline = new Date().getTime() + 5000;
+	while (new Date().getTime() < deadline) {
+		const url = (await vscode.commands.executeCommand(
+			'github1s.vscode.get-browser-url'
+		)) as string;
+		console.log(`url: ${url}`);
+		if (url.endsWith(docFilePath)) {
+			console.log('showPreview');
+			await vscode.commands.executeCommand('markdown.showPreview').then(
+				() => {},
+				(e) => console.error(e)
+			);
+			return;
+		}
+
+		await sleep(500);
+	}
+	console.warn(
+		`Timeout waiting for browser url to change, skip showing preview for ${docFilePath}`
+	);
 }
 
 // initialize the VSCode's state according to the router url
