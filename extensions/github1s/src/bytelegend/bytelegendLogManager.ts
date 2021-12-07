@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { Terminal } from 'vscode';
 import { ByteLegendContext } from '@/bytelegend/bytelegendContext';
 import { generateUuid } from '../../../../vscode-web-github1s/lib/vscode/src/vs/base/common/uuid';
-import { runCatching } from '@/bytelegend/commands';
+import { runCatching } from '@/bytelegend/utils';
 
 export class ByteLegendLogManager {
 	/**
