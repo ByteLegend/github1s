@@ -55,7 +55,6 @@ export async function activate(context: vscode.ExtensionContext) {
 	registerByteLegendCommands();
 	await byteLegendContext.init();
 	vscode.workspace.onDidOpenTextDocument((doc) => {
-		console.log(`${doc.uri}: ${doc.languageId}`);
 		if (doc && doc.languageId === 'markdown') {
 			openMarkdownPreview(doc.uri.toString().substring('github1s:'.length));
 		}
@@ -69,9 +68,7 @@ async function openMarkdownPreview(docFilePath: string) {
 		const url = (await vscode.commands.executeCommand(
 			'github1s.vscode.get-browser-url'
 		)) as string;
-		console.log(`url: ${url}`);
 		if (url.endsWith(docFilePath)) {
-			console.log('showPreview');
 			await vscode.commands.executeCommand('markdown.showPreview').then(
 				() => {},
 				(e) => console.error(e)
