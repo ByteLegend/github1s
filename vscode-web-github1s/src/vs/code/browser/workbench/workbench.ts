@@ -23,6 +23,7 @@ import { create, ICredentialsProvider, IProductQualityChangeHandler, ISettingsSy
 import {
 	getBrowserUrl,
 	getInitData,
+	isActivityBarVisible,
 	isTerminalVisible,
 	postMessageToParentWindow,
 	replaceBrowserUrl,
@@ -33,6 +34,7 @@ import { renderNotification } from 'vs/github1s/notification';
 import { getGitHubAccessToken } from 'vs/github1s/authorizing-github';
 // eslint-disable-next-line
 import { getGitHubAccessTokenWithOverlay, hideAuthorizingOverlay } from 'vs/github1s/authorizing-overlay';
+import { getEditorTabGroups } from 'vs/github1s/util';
 
 // custom vs code commands defined by github1s
 const getGitHub1sCustomCommands: () => {
@@ -47,6 +49,8 @@ const getGitHub1sCustomCommands: () => {
 	{ id: 'bytelegend.getInitData', handler: getInitData },
 	{ id: 'bytelegend.postMessageToParentWindow', handler: postMessageToParentWindow },
 	{ id: 'bytelegend.isTerminalVisible', handler: isTerminalVisible },
+	{ id: 'bytelegend.isActivityBarVisible', handler: isActivityBarVisible },
+	{ id: 'bytelegend.getEditorTabGroups', handler: getEditorTabGroups },
 ];
 // above codes are changed by github1s
 
@@ -420,7 +424,7 @@ class WindowIndicator implements IWindowIndicator {
 
 			// below codes are changed by github1s
 			if (uri?.scheme === 'github1s') {
-				[repositoryOwner = 'conwnet', repositoryName = 'github1s'] = URI.parse(getBrowserUrl()).path.split('/').filter(Boolean);
+				[repositoryOwner = 'ByteLegend', repositoryName = 'ByteLegend'] = URI.parse(getBrowserUrl()).path.split('/').filter(Boolean);
 			}
 			// above codes are changed by github1s
 		}

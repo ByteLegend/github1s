@@ -16,6 +16,22 @@ export const isTerminalVisible = (): boolean => {
 	return document.querySelectorAll(".xterm-viewport").length != 0
 }
 
+export const isActivityBarVisible = (): boolean => {
+	return document.querySelectorAll(".visible>#workbench\\.parts\\.activitybar").length != 0
+}
+
+/**
+ * Neither `vscode.window.visibleTextEditors` nor `vscode.window.visibleTextEditors`
+ * provides a satisfying API to get visible tab groups.
+ */
+export const getEditorTabGroups = (): string[][] => {
+	const tabGroups = document.querySelectorAll(".tabs-and-actions-container");
+	return Array.prototype.map.call(tabGroups, (tabGroup) => {
+		const tabs = tabGroup.querySelectorAll(".monaco-icon-name-container")
+		return Array.prototype.map.call(tabs, (tab) => tab.innerText);
+	}) as string[][]
+}
+
 export const postMessageToParentWindow = (message: any) => {
 	return window.parent?.postMessage(message, '*')
 }
