@@ -33,14 +33,31 @@
           "id": "github1s",
           "title": "GitHub1s",
           "icon": "assets/github1s.svg"
+        },
+        {
+          "id": "bytelegend",
+          "title": "ByteLegend",
+          "icon": "assets/bytelegend.png"
+        },
+        {
+          "id": "tutorials",
+          "title": "Tutorials",
+          "icon": "$(library)"
         }
       ]
     },
     "views": {
-      "scm": [
+      "bytelegend": [
         {
           "id": "bytelegend.views.my-answer-list",
           "name": "My Answers"
+        }
+      ],
+      "tutorials": [
+        {
+          "id": "bytelegend.views.tutorials",
+          "name": "Tutorials",
+          "type": "webview"
         }
       ]
     },

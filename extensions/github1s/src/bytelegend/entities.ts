@@ -132,3 +132,13 @@ export const CheckRunConclusion = {
 	STALE: 'STALE',
 	TIMED_OUT: 'TIMED_OUT',
 };
+
+export class Tutorial {
+	constructor(
+		readonly id: string,
+		readonly title: string,
+		readonly type: string,
+		readonly href: string,
+		readonly languages: Array<string>
+	) {}
+}

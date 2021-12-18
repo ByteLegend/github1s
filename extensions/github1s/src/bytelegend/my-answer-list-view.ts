@@ -35,7 +35,7 @@ export class MyAnswerTreeDataProvider
 	}
 
 	get answers() {
-		return this._answers;
+		return this._answers || [];
 	}
 
 	public async updateTree(answers: PullRequestAnswer[]) {

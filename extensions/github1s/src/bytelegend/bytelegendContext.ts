@@ -6,6 +6,7 @@ import { ByteLegendLogManager } from '@/bytelegend/bytelegendLogManager';
 import router from '@/router';
 import { initialVSCodeState } from '@/extension';
 import { runCatching } from '@/bytelegend/utils';
+import { TutorialsView } from '@/bytelegend/tutorials-view';
 
 /**
  * Router states:
@@ -41,9 +42,7 @@ export class ByteLegendContext {
 			);
 
 			if (anyLiveLogs || anyUnfinished) {
-				await vscode.commands.executeCommand(
-					'bytelegend.views.my-answer-list.focus'
-				);
+				await this.focusOnMyAnswerView();
 			}
 
 			if (anyLiveLogs) {
@@ -116,12 +115,33 @@ export class ByteLegendContext {
 		return new Date(iso8601).toLocaleString(this.locale);
 	}
 
+	// View name to focus on startup. Can be "explorer", "tutorials", "MyAnswer"
+	get initFocusView(): string {
+		return this._initData?.initFocusView;
+	}
+
+	// Init readme to be displayed. Can be:
+	// 1. https://github.com/owner/repo/blob/main/path/to.md
+	// 2. https://raw.githubusercontent.com/owner/repo/main/path/to.md
+	// 3. Raw HTML string
+	get initReadme(): string {
+		return this._initData?.initReadme;
+	}
+
+	get showActivityBar(): boolean {
+		return this._initData?.showActivityBar !== false;
+	}
+
 	get locale(): string {
-		return this._initData.locale;
+		return this._initData?.locale || 'en';
+	}
+
+	get localeName(): string {
+		return this._initData?.localeName || 'English';
 	}
 
 	get missionId(): string {
-		return this._initData.missionId;
+		return this._initData?.missionId;
 	}
 
 	get challengeId(): string {
@@ -133,7 +153,7 @@ export class ByteLegendContext {
 	}
 
 	get apiServer(): string {
-		return this._initData.apiServer;
+		return this._initData?.apiServer || 'https://bytelegend.com';
 	}
 
 	get whitelist(): string {
@@ -342,19 +362,24 @@ export class ByteLegendContext {
 						newPullRequestAnswerInResponse.commits[0]
 					);
 				} else {
-					this._initData.latestOpenPullRequest =
-						newPullRequestAnswerInResponse.htmlUrl;
 					await this.switchToBranch(newPullRequestAnswerInResponse.branch);
 					currentAnswers.unshift(newPullRequestAnswerInResponse);
 				}
 				await this.answerTreeDataProvider.updateTree(currentAnswers);
-				await vscode.commands.executeCommand(
-					'bytelegend.views.my-answer-list.focus'
-				);
 
 				ByteLegendContext.setSubmitAnswerButton(true, 'CheckingAnswer');
 			}
 		}
+	}
+
+	async focusOnMyAnswerView() {
+		await vscode.commands.executeCommand(
+			`${MyAnswerTreeDataProvider.viewId}.focus`
+		);
+	}
+
+	async focusOnTutorialsView() {
+		await vscode.commands.executeCommand(`${TutorialsView.viewId}.focus`);
 	}
 
 	// {baseUrl}/{owner}/{repo}/blob/main/{path} -> {baseUrl}/{owner}/{repo}/blob/{newBranch}/{path}

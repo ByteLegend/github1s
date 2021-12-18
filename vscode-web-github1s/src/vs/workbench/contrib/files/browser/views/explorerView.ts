@@ -252,7 +252,7 @@ export class ExplorerView extends ViewPane {
 			// set file explorer title with `${route.owner}/${route.repo}`
 			const currentFolderUri = workspace.folders?.[0].uri;
 			const textContent = currentFolderUri && currentFolderUri.scheme === 'github1s'
-				? URI.parse(window.location.href).path.split('/').filter(Boolean).slice(0, 2).join('/') || 'conwnet/github1s'
+				? URI.parse(window.location.href).path.split('/').filter(Boolean).slice(0, 2).join('/') || 'ByteLegend/ByteLegend'
 				: this.name;
 			titleElement.textContent = textContent;
 			// above codes are changed by github1s

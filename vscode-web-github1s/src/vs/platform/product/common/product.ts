@@ -59,8 +59,8 @@ else {
 		Object.assign(product, {
 			version: '1.60.0-dev',
 			// below codes are changed by github1s
-			nameShort: 'GitHub1s',
-			nameLong: 'GitHub1s',
+			nameShort: 'ByteLegend',
+			nameLong: 'ByteLegend',
 			// above codes are changed by github1s
 			applicationName: 'code-oss',
 			dataFolderName: '.vscode-oss',

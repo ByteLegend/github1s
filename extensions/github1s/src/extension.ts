@@ -4,21 +4,19 @@
  */
 
 import * as vscode from 'vscode';
-import { setExtensionContext } from '@/helpers/context';
+import { commands, TreeItemCollapsibleState, Uri } from 'vscode';
+import { getExtensionContext, setExtensionContext } from '@/helpers/context';
 import { registerGitHub1sCommands } from '@/commands';
 import { registerVSCodeProviders } from '@/providers';
-import { registerCustomViews } from '@/views';
 import { GitHub1sFileSystemProvider } from '@/providers/fileSystemProvider';
-import { showSponsors } from '@/sponsors';
-import { showGitpod } from '@/gitpod';
 import router from '@/router';
 import { activateSourceControl } from '@/source-control';
 import { registerEventListeners } from '@/listeners';
 import { PageType } from './router/types';
 import { byteLegendContext } from '@/bytelegend/bytelegendContext';
-import { registerByteLegendCommands } from '@/bytelegend/commands';
-import { getApiServer } from '@/interfaces/github-api-rest';
-import { sleep } from '@/bytelegend/utils';
+import { open, registerByteLegendCommands } from '@/bytelegend/commands';
+import { MyAnswerTreeDataProvider } from '@/bytelegend/my-answer-list-view';
+import { TutorialsView } from '@/bytelegend/tutorials-view';
 
 export async function activate(context: vscode.ExtensionContext) {
 	const browserUrl = (await vscode.commands.executeCommand(
@@ -35,7 +33,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	// register VS Code providers
 	registerVSCodeProviders();
 	// register custom views
-	registerCustomViews();
+	// registerCustomViews();
 	// register GitHub1s Commands
 	registerGitHub1sCommands();
 
@@ -54,33 +52,110 @@ export async function activate(context: vscode.ExtensionContext) {
 	// Below is changed by ByteLegend
 	registerByteLegendCommands();
 	await byteLegendContext.init();
+	await registerByteLegendViews();
 	vscode.workspace.onDidOpenTextDocument((doc) => {
 		if (doc && doc.languageId === 'markdown') {
-			openMarkdownPreview(doc.uri.toString().substring('github1s:'.length));
+			openMarkdownPreview(browserUrl, doc.uri);
 		}
 	});
-	// Above is changed by ByteLegend
+
+	const activityBarVisibleNow = await vscode.commands.executeCommand(
+		'bytelegend.isActivityBarVisible'
+	);
+	const expectedActivityBarVisible = byteLegendContext.showActivityBar;
+	if (
+		(activityBarVisibleNow && !expectedActivityBarVisible) ||
+		(!activityBarVisibleNow && expectedActivityBarVisible)
+	) {
+		await vscode.commands.executeCommand(
+			'workbench.action.toggleActivityBarVisibility'
+		);
+	}
+	if (byteLegendContext.initFocusView) {
+		const viewName = byteLegendContext.initFocusView.toLowerCase();
+		if (viewName.indexOf('answer') != -1) {
+			await byteLegendContext.focusOnMyAnswerView();
+		} else if (viewName.indexOf('tutorial') != -1) {
+			await byteLegendContext.focusOnTutorialsView();
+		}
+	}
+	if (byteLegendContext.initReadme) {
+		await vscode.commands.executeCommand('workbench.action.closeAllEditors');
+		if (byteLegendContext.initReadme.startsWith('https://')) {
+			await open(
+				byteLegendContext.initReadme.replace('https://', 'github1s://')
+			);
+		} else {
+			await open(byteLegendContext.initReadme);
+		}
+	}
 }
 
-async function openMarkdownPreview(docFilePath: string) {
-	const deadline = new Date().getTime() + 5000;
-	while (new Date().getTime() < deadline) {
-		const url = (await vscode.commands.executeCommand(
-			'github1s.vscode.get-browser-url'
-		)) as string;
-		if (url.endsWith(docFilePath)) {
-			await vscode.commands.executeCommand('markdown.showPreview').then(
-				() => {},
-				(e) => console.error(e)
-			);
-			return;
-		}
+async function registerByteLegendViews() {
+	const context = getExtensionContext();
 
-		await sleep(500);
-	}
-	console.warn(
-		`Timeout waiting for browser url to change, skip showing preview for ${docFilePath}`
+	const myAnswerTreeView = vscode.window.createTreeView(
+		MyAnswerTreeDataProvider.viewId,
+		{
+			treeDataProvider: byteLegendContext.answerTreeDataProvider,
+		}
 	);
+	myAnswerTreeView.onDidChangeSelection((e) => {
+		const oldState = e.selection[0].collapsibleState;
+		if (oldState == TreeItemCollapsibleState.Collapsed) {
+			myAnswerTreeView.reveal(e.selection[0], { expand: true });
+		}
+	});
+
+	context.subscriptions.push(
+		vscode.window.registerWebviewViewProvider(
+			TutorialsView.viewId,
+			new TutorialsView(byteLegendContext)
+		),
+		myAnswerTreeView
+	);
+}
+
+function getFileName(filePath: string) {
+	const lastIndexOfSlash = filePath.indexOf('/');
+	return filePath.substring(lastIndexOfSlash + 1);
+}
+
+async function openMarkdownPreview(initBrowserUrl: string, uri: Uri) {
+	const tabGroups: string[][] = await vscode.commands.executeCommand(
+		'bytelegend.getEditorTabGroups'
+	);
+	const flatTabs = Array.prototype.concat.apply([], tabGroups);
+	const fileName = getFileName(uri.path);
+	if (!flatTabs.find((tab) => tab == fileName)) {
+		// we may have already fired `closeAllEditors` command, don't show the preview for the closed markdown tab
+		return;
+	}
+
+	await vscode.commands.executeCommand('markdown.showPreview', null, [uri], {
+		locked: true,
+	});
+
+	if (
+		uri.toString().endsWith('README.md') &&
+		initBrowserUrl.endsWith('README.md') &&
+		tabGroups.length == 1
+	) {
+		// only open the challenged file upon first open
+		const initData = await commands.executeCommand('bytelegend.getInitData');
+		const whitelist = initData?.['whitelist'] || [];
+		if (whitelist.length != 0 && !whitelist[0].endsWith('/')) {
+			const fileName = getFileName(whitelist[0]);
+			if (!tabGroups[0].find((name) => name == fileName)) {
+				await vscode.commands.executeCommand(
+					'vscode.openWith',
+					Uri.parse(`github1s:/${whitelist[0]}`),
+					'default',
+					vscode.ViewColumn.Beside
+				);
+			}
+		}
+	}
 }
 
 // initialize the VSCode's state according to the router url
