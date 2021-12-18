@@ -13,6 +13,7 @@ import {
 	FileStat,
 	FileType,
 	Uri,
+	commands,
 } from 'vscode';
 import { toUint8Array as decodeBase64 } from 'js-base64';
 import router from '@/router';
@@ -262,7 +263,62 @@ export class GitHub1sFileSystemProvider
 			 */
 			const [owner, repo] = file.uri.authority.split('+');
 			const blob = await readGitHubFile(owner, repo, file.sha);
-			file.data = decodeBase64(blob.content);
+			// Below is changed by ByteLegend
+			const fileContent = decodeBase64(blob.content);
+
+			if (uri.toString().endsWith('README.md')) {
+				const initData: any = await commands.executeCommand(
+					'bytelegend.getInitData'
+				);
+				const localeName = initData?.['localeName'] || 'English';
+				const markdown = new TextDecoder().decode(fileContent);
+				let replaced = markdown
+					.replace(
+						/<details open='true'>\s*<summary>English/,
+						'<details><summary>English'
+					)
+					.replace(
+						new RegExp(`<details>\\s*<summary>${localeName}`),
+						`<details open='true'><summary>${localeName}`
+					);
+
+				if (initData?.gfw) {
+					replaced = replaced
+						.replace(
+							'https://raw.githubusercontent.com/',
+							`${initData.apiServer}/ghraw/`
+						)
+						.replace(
+							'https://avatars.githubusercontent.com/',
+							`${initData.apiServer}/ghavatars/`
+						);
+				}
+				file.data = new TextEncoder().encode(replaced);
+			} else if (uri.toString().endsWith('.md')) {
+				const initData: any = await commands.executeCommand(
+					'bytelegend.getInitData'
+				);
+				const markdown = new TextDecoder().decode(fileContent);
+
+				if (initData?.gfw) {
+					file.data = new TextEncoder().encode(
+						markdown
+							.replace(
+								'https://raw.githubusercontent.com/',
+								`${initData.apiServer}/ghraw/`
+							)
+							.replace(
+								'https://avatars.githubusercontent.com/',
+								`${initData.apiServer}/ghavatars/`
+							)
+					);
+				} else {
+					file.data = fileContent;
+				}
+			} else {
+				file.data = fileContent;
+			}
+			// Above is changed by ByteLegend
 			return file.data;
 		},
 		(uri) => uri.toString()
