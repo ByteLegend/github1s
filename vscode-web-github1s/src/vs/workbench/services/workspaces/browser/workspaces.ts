@@ -27,7 +27,7 @@ export function getSingleFolderWorkspaceIdentifier(folderPath: URI): ISingleFold
 	if (!folderPath.authority) {
 		// Use string `owner+repo:path` to generate id
 		// In this way, the workspaceState will be isolated between from different repo
-		const [owner = 'conwnet', repo = 'github1s'] = URI.parse(window.location.href).path.split('/').filter(Boolean);
+		const [owner = 'ByteLegend', repo = 'ByteLegend'] = URI.parse(window.location.href).path.split('/').filter(Boolean);
 		const id = hash(`${owner}+${repo}:${folderPath.toString()}`).toString(16);
 		return { id, uri: folderPath };
 	}

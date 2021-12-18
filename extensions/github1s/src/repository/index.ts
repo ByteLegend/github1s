@@ -46,13 +46,13 @@ export class Repository {
 	// get current repo owner
 	public getOwner() {
 		const pathname = router.history.location.pathname;
-		return pathname.split('/').filter(Boolean)[0] || 'conwnet';
+		return pathname.split('/').filter(Boolean)[0] || 'ByteLegend';
 	}
 
 	// get current repo name
 	public getRepo() {
 		const pathname = router.history.location.pathname;
-		return pathname.split('/').filter(Boolean)[1] || 'github1s';
+		return pathname.split('/').filter(Boolean)[1] || 'ByteLegend';
 	}
 
 	// get all branches for current repository

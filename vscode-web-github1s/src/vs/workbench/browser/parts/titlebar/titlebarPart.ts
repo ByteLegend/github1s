@@ -309,7 +309,7 @@ export class TitlebarPart extends Part implements ITitleService {
 		const separator = this.configurationService.getValue<string>('window.titleSeparator');
 		const titleTemplate = this.configurationService.getValue<string>('window.title');
 		// below codes are changed by github1s TEMP!!
-		const [owner = 'conwnet', repo = 'github1s'] = URI.parse(window.location.href).path.split('/').filter(Boolean);
+		const [owner = 'ByteLegend', repo = 'ByteLegend'] = URI.parse(window.location.href).path.split('/').filter(Boolean);
 		// above codes are changed by github1s
 
 		return template(titleTemplate, {

@@ -46,8 +46,8 @@ export const parseGitHubUrl = async (path: string): Promise<RouterState> => {
 
 	// fallback to default
 	return {
-		owner: 'conwnet',
-		repo: 'github1s',
+		owner: 'ByteLegend',
+		repo: 'ByteLegend',
 		pageType: PageType.TREE,
 		ref: 'HEAD',
 	};
