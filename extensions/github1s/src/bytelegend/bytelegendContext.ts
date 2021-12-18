@@ -366,6 +366,7 @@ export class ByteLegendContext {
 					currentAnswers.unshift(newPullRequestAnswerInResponse);
 				}
 				await this.answerTreeDataProvider.updateTree(currentAnswers);
+				await this.focusOnMyAnswerView();
 
 				ByteLegendContext.setSubmitAnswerButton(true, 'CheckingAnswer');
 			}
