@@ -66,10 +66,6 @@ import { HTMLFileSystemProvider } from 'vs/platform/files/browser/htmlFileSystem
 import { IOpenerService } from 'vs/platform/opener/common/opener';
 import { safeStringify } from 'vs/base/common/objects';
 import { globals } from "vs/base/common/platform";
-import {
-	AutoSaveMode,
-	IFilesConfigurationService
-} from "vs/workbench/services/filesConfiguration/common/filesConfigurationService";
 
 class BrowserMain extends Disposable {
 
@@ -115,13 +111,6 @@ class BrowserMain extends Disposable {
 			const timerService = accessor.get(ITimerService);
 			const openerService = accessor.get(IOpenerService);
 			const productService = accessor.get(IProductService);
-			// below codes are changed by ByteLegend
-			// we need to disable autosave, otherwise the editor will immediately become undirty after change
-			const filesConfigurationService = accessor.get(IFilesConfigurationService);
-			if (filesConfigurationService.getAutoSaveMode() !== AutoSaveMode.OFF) {
-				filesConfigurationService.toggleAutoSave()
-			}
-			// above codes are changed by ByteLegend
 
 			return {
 				commands: {
