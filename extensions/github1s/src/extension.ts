@@ -67,6 +67,13 @@ export async function activate(context: vscode.ExtensionContext) {
 			'workbench.action.toggleActivityBarVisibility'
 		);
 	}
+
+	await configureDefaultSettings();
+	await focusInitView();
+	await openInitReadme();
+}
+
+async function focusInitView() {
 	if (byteLegendContext.initFocusView) {
 		const viewName = byteLegendContext.initFocusView.toLowerCase();
 		if (viewName.indexOf('answer') != -1) {
@@ -75,6 +82,9 @@ export async function activate(context: vscode.ExtensionContext) {
 			await byteLegendContext.focusOnTutorialsView();
 		}
 	}
+}
+
+async function openInitReadme() {
 	if (byteLegendContext.initReadme) {
 		await vscode.commands.executeCommand('workbench.action.closeAllEditors');
 		if (byteLegendContext.initReadme.startsWith('https://')) {
@@ -83,6 +93,11 @@ export async function activate(context: vscode.ExtensionContext) {
 			await open(byteLegendContext.initReadme);
 		}
 	}
+}
+
+async function configureDefaultSettings() {
+	vscode.workspace.getConfiguration().update('files.autoSave', 'off', vscode.ConfigurationTarget.Global)
+	vscode.workspace.getConfiguration().update('editor.bracketPairColorization.enabled', true, vscode.ConfigurationTarget.Global)
 }
 
 async function registerByteLegendViews() {
