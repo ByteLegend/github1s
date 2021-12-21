@@ -1,5 +1,4 @@
 import * as vscode from 'vscode';
-import { Uri } from 'vscode';
 import { getExtensionContext } from '@/helpers/context';
 import { getNonce, getWebviewOptions } from '@/helpers/util';
 import { ByteLegendContext } from '@/bytelegend/bytelegendContext';
@@ -174,6 +173,10 @@ button.secondary:hover {
 .tutorials-container {
 	display: none;
 }
+.tutorials-container div {
+	text-align: center;
+	margin-top: 64px;
+}
 
 .tutorials-container li img{
 	width: 16px;
@@ -218,8 +221,14 @@ button.secondary:hover {
 			document.querySelector('.error-container').style.display = 'none';
 			const tutorialContainer = document.querySelector('.tutorials-container')
 			tutorialContainer.style.display = 'block';
-			tutorialContainer.innerHTML = ''
-			tutorialContainer.appendChild(tutorialsToOl(json.items))
+            if (json.items.length === 0) {
+				tutorialContainer.innerHTML = '<div>${this.bytelegendContext.getI18nText(
+					'NoTutorials'
+				)}</div>';
+            } else {
+				tutorialContainer.innerHTML = '';
+				tutorialContainer.appendChild(tutorialsToOl(json.items));
+			}
 	    }, onFetchingTutorialsError)
 	}
 
@@ -274,7 +283,9 @@ button.secondary:hover {
 	}
 
 	function getTutorials() {
-	  	window.fetch('${this.bytelegendContext.apiServer}/game/api/tutorials?missionId=${this.bytelegendContext.missionId}')
+	  	window.fetch('${
+				this.bytelegendContext.apiServer
+			}/game/api/tutorials?missionId=${this.bytelegendContext.missionId}')
 	   		.then(updateTutorials, onFetchingTutorialsError)
 	}
 
