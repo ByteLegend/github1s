@@ -60,22 +60,20 @@ export async function activate(context: vscode.ExtensionContext) {
 		}
 	});
 
-	const activityBarVisibleNow = await vscode.commands.executeCommand(
-		'bytelegend.isActivityBarVisible'
-	);
+	await setUpActivityBar()
+	await configureDefaultSettings();
+	await focusInitView();
+	await openInitReadme();
+}
+
+async function setUpActivityBar() {
+	const activityBarVisibleNow = await vscode.commands.executeCommand('bytelegend.isActivityBarVisible');
 	const expectedActivityBarVisible = byteLegendContext.showActivityBar;
-	if (
-		(activityBarVisibleNow && !expectedActivityBarVisible) ||
-		(!activityBarVisibleNow && expectedActivityBarVisible)
-	) {
+	if ((activityBarVisibleNow && !expectedActivityBarVisible) || (!activityBarVisibleNow && expectedActivityBarVisible)) {
 		await vscode.commands.executeCommand(
 			'workbench.action.toggleActivityBarVisibility'
 		);
 	}
-
-	await configureDefaultSettings();
-	await focusInitView();
-	await openInitReadme();
 }
 
 async function focusInitView() {
