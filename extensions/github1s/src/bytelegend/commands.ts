@@ -67,18 +67,27 @@ function parseByteLegendUri(uri: string): Uri {
 		const matchResult = /github.com\/([\w_-]+)\/([\w_-]+)\/blob\/([\w_.-]+)\/(.*)/.exec(
 			uri
 		);
-		return Uri.parse(`github1s:/${matchResult[4]}`).with({
-			authority: `${matchResult[1]}+${matchResult[2]}+${matchResult[3]}`,
-		});
+		return buildByteLegendUri(matchResult[1], matchResult[2], matchResult[3], matchResult[4])
 	} else if (uri.startsWith('github1s://raw.githubusercontent.com')) {
 		const matchResult = /raw.githubusercontent.com\/([\w_-]+)\/([\w_-]+)\/([\w_.-]+)\/(.*)/.exec(
 			uri
 		);
-		return Uri.parse(`github1s:/${matchResult[4]}`).with({
-			authority: `${matchResult[1]}+${matchResult[2]}+${matchResult[3]}`,
-		});
+		return buildByteLegendUri(matchResult[1], matchResult[2], matchResult[3], matchResult[4])
 	} else {
 		return Uri.parse(uri);
+	}
+}
+
+function buildByteLegendUri(owner: string, repo: string, ref: string, relativePathToRoot: string) {
+	const ret = Uri.parse(`github1s:/${relativePathToRoot}`)
+	console.log(repo, owner, byteLegendContext.getRepo(), byteLegendContext.getOwner())
+	if (repo == byteLegendContext.getRepo() && owner == byteLegendContext.getOwner()) {
+		// the target url exists in current repo, let's just open it!
+		return ret
+	} else {
+		return ret.with({
+			authority: `${repo}+${owner}+${ref}`
+		})
 	}
 }
 
