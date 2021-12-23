@@ -42,7 +42,11 @@ export class ByteLegendLogManager {
 	 * During this interval, we create a dummy log displaying the pending status.
 	 */
 	showPendingStatus(line: string): CheckRunLog {
-		return this.getOrCreateLog(`PendingStatus-${new Date().getTime()}`, 'Log', true)
+		return this.getOrCreateLog(
+			`PendingStatus-${new Date().getTime()}`,
+			'Log',
+			true
+		)
 			.activate()
 			.startPendingStatus(line);
 	}
