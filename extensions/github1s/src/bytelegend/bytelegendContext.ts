@@ -1,12 +1,12 @@
-import { AnswerCommit, PullRequestAnswer } from '@/bytelegend/entities';
-import { MyAnswerTreeDataProvider } from '@/bytelegend/my-answer-list-view';
+import {AnswerCommit, PullRequestAnswer} from '@/bytelegend/entities';
+import {MyAnswerTreeDataProvider} from '@/bytelegend/my-answer-list-view';
 import * as vscode from 'vscode';
-import { TreeItem } from 'vscode';
-import { ByteLegendLogManager } from '@/bytelegend/bytelegendLogManager';
+import {TreeItem} from 'vscode';
+import {ByteLegendLogManager} from '@/bytelegend/bytelegendLogManager';
 import router from '@/router';
-import { initialVSCodeState } from '@/extension';
-import { runCatching } from '@/bytelegend/utils';
-import { TutorialsView } from '@/bytelegend/tutorials-view';
+import {initialVSCodeState} from '@/extension';
+import {runCatching} from '@/bytelegend/utils';
+import {TutorialsView} from '@/bytelegend/tutorials-view';
 
 /**
  * Router states:
@@ -113,6 +113,18 @@ export class ByteLegendContext {
 
 	private formatIso8601(iso8601: string): string {
 		return new Date(iso8601).toLocaleString(this.locale);
+	}
+
+	// get current repo owner
+	public getOwner() {
+		const pathname = router.history.location.pathname;
+		return pathname.split('/').filter(Boolean)[0] || 'ByteLegend';
+	}
+
+	// get current repo name
+	public getRepo() {
+		const pathname = router.history.location.pathname;
+		return pathname.split('/').filter(Boolean)[1] || 'ByteLegend';
 	}
 
 	// View name to focus on startup. Can be "explorer", "tutorials", "MyAnswer"
