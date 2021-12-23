@@ -27,7 +27,7 @@ export class MyAnswerTreeDataProvider
 
 	public getNodeByCheckRunId(checkRunId: string): AnswerCommit | null {
 		for (const value of this._idToTreeNode.values()) {
-			if (value instanceof AnswerCommit && value.checkRunId == checkRunId) {
+			if (value instanceof AnswerCommit && value.checkRunId === checkRunId) {
 				return value;
 			}
 		}

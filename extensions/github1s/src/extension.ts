@@ -60,16 +60,21 @@ export async function activate(context: vscode.ExtensionContext) {
 		}
 	});
 
-	await setUpActivityBar()
+	await setUpActivityBar();
 	await configureDefaultSettings();
 	await focusInitView();
 	await openInitReadme();
 }
 
 async function setUpActivityBar() {
-	const activityBarVisibleNow = await vscode.commands.executeCommand('bytelegend.isActivityBarVisible');
+	const activityBarVisibleNow = await vscode.commands.executeCommand(
+		'bytelegend.isActivityBarVisible'
+	);
 	const expectedActivityBarVisible = byteLegendContext.showActivityBar;
-	if ((activityBarVisibleNow && !expectedActivityBarVisible) || (!activityBarVisibleNow && expectedActivityBarVisible)) {
+	if (
+		(activityBarVisibleNow && !expectedActivityBarVisible) ||
+		(!activityBarVisibleNow && expectedActivityBarVisible)
+	) {
 		await vscode.commands.executeCommand(
 			'workbench.action.toggleActivityBarVisibility'
 		);
@@ -79,9 +84,9 @@ async function setUpActivityBar() {
 async function focusInitView() {
 	if (byteLegendContext.initFocusView) {
 		const viewName = byteLegendContext.initFocusView.toLowerCase();
-		if (viewName.indexOf('answer') != -1) {
+		if (viewName.indexOf('answer') !== -1) {
 			await byteLegendContext.focusOnMyAnswerView();
-		} else if (viewName.indexOf('tutorial') != -1) {
+		} else if (viewName.indexOf('tutorial') !== -1) {
 			await byteLegendContext.focusOnTutorialsView();
 		}
 	}
@@ -124,7 +129,7 @@ async function registerByteLegendViews() {
 	);
 	myAnswerTreeView.onDidChangeSelection((e) => {
 		const oldState = e.selection[0].collapsibleState;
-		if (oldState == TreeItemCollapsibleState.Collapsed) {
+		if (oldState === TreeItemCollapsibleState.Collapsed) {
 			myAnswerTreeView.reveal(e.selection[0], { expand: true });
 		}
 	});
@@ -163,7 +168,7 @@ async function openMarkdownPreview(initBrowserUrl: string, uri: Uri) {
 		);
 		const flatTabs = Array.prototype.concat.apply([], tabGroups);
 		const fileName = getFileName(uri.path);
-		if (flatTabs.find((tab) => tab == fileName)) {
+		if (flatTabs.find((tab) => tab === fileName)) {
 			// we may have already fired `closeAllEditors` command, don't show the preview for the closed markdown tab
 			await doOpenPreview(initBrowserUrl, uri, tabGroups);
 			return;
@@ -188,14 +193,14 @@ async function doOpenPreview(
 	if (
 		uri.toString().endsWith('README.md') &&
 		initBrowserUrl.endsWith('README.md') &&
-		tabGroups.length == 1
+		tabGroups.length === 1
 	) {
 		// only open the challenged file upon first open
 		const initData = await commands.executeCommand('bytelegend.getInitData');
 		const whitelist = initData?.['whitelist'] || [];
-		if (whitelist.length != 0 && !whitelist[0].endsWith('/')) {
+		if (whitelist.length !== 0 && !whitelist[0].endsWith('/')) {
 			const fileName = getFileName(whitelist[0]);
-			if (!tabGroups[0].find((name) => name == fileName)) {
+			if (!tabGroups[0].find((name) => name === fileName)) {
 				await vscode.commands.executeCommand(
 					'vscode.openWith',
 					Uri.parse(`github1s:/${whitelist[0]}`),

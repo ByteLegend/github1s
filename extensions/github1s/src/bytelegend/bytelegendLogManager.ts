@@ -34,7 +34,7 @@ export class ByteLegendLogManager {
 		return log;
 	}
 
-	private showFetching(log: CheckRunLog) {
+	private static showFetching(log: CheckRunLog) {
 		setTimeout(() => {}, 1000);
 	}
 
@@ -84,7 +84,7 @@ export class ByteLegendLogManager {
 				currentLog.appendLines(['\x1B[91m']);
 				currentLog.appendLines([err.toString()]);
 				currentLog.appendLines(['\x1B[0m']);
-			} else if (logResponse.status == 404 || logResponse.status == 410) {
+			} else if (logResponse.status === 404 || logResponse.status === 410) {
 				currentLog.appendLines(['\x1B[91m']);
 				currentLog.appendLines([this.context.getI18nText('LogCleanedUp')]);
 				currentLog.appendLines(['\x1B[0m']);

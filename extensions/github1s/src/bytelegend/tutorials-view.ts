@@ -24,13 +24,13 @@ export class TutorialsView implements vscode.WebviewViewProvider {
 		);
 		webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
 		webviewView.webview.onDidReceiveMessage((data) => {
-			if (data.type == 'open.tutorial') {
-				this.openTutorial(data.tutorial as Tutorial);
+			if (data.type === 'open.tutorial') {
+				TutorialsView.openTutorial(data.tutorial as Tutorial);
 			}
 		});
 	}
 
-	private openTutorial(tutorial: Tutorial) {
+	private static openTutorial(tutorial: Tutorial) {
 		if (tutorial.type.startsWith('text/')) {
 			vscode.commands.executeCommand(
 				'bytelegend.open',

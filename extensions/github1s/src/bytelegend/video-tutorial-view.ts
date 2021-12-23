@@ -3,7 +3,7 @@ import { getNonce } from '@/helpers/util';
 import { Tutorial } from '@/bytelegend/entities';
 
 function getIframeTagForTutorial(tutorial: Tutorial): string {
-	if (tutorial.type == 'video/youtube') {
+	if (tutorial.type === 'video/youtube') {
 		// https://www.youtube.com/watch?v=ABC -> https://www.youtube.com/embed/ABC
 		return `
 		<iframe
@@ -14,10 +14,9 @@ function getIframeTagForTutorial(tutorial: Tutorial): string {
 			height="100%"
 		></iframe>
 		`;
-	} else if (tutorial.type == 'video/bilibili') {
+	} else if (tutorial.type === 'video/bilibili') {
 		// https://www.bilibili.com/video/BV1JJ41197UK -> BV1JJ41197UK
-		const url = tutorial.href;
-		const bvid = getBvid(url);
+		const bvid = getBvid(tutorial.href);
 		return `
 		<iframe
 			class="tutorial-video-player"
@@ -34,7 +33,7 @@ function getIframeTagForTutorial(tutorial: Tutorial): string {
 
 function substringAfter(str: string, target: string) {
 	const index = str.indexOf(target);
-	if (index == -1) {
+	if (index === -1) {
 		return str;
 	} else {
 		return str.substring(index + target.length);
@@ -43,7 +42,7 @@ function substringAfter(str: string, target: string) {
 
 function substringBefore(str: string, target: string) {
 	const index = str.indexOf(target);
-	if (index == -1) {
+	if (index === -1) {
 		return str;
 	} else {
 		return str.substring(0, index);
@@ -51,7 +50,7 @@ function substringBefore(str: string, target: string) {
 }
 
 function getBvid(url: string): string {
-	if (url.indexOf('www.bilibili.com') != -1) {
+	if (url.indexOf('www.bilibili.com') !== -1) {
 		return substringAfter(url, 'video/');
 	} else {
 		return substringBefore(substringAfter(url, 'bvid'), '&');

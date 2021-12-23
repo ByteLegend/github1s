@@ -1,12 +1,12 @@
-import {AnswerCommit, PullRequestAnswer} from '@/bytelegend/entities';
-import {MyAnswerTreeDataProvider} from '@/bytelegend/my-answer-list-view';
+import { AnswerCommit, PullRequestAnswer } from '@/bytelegend/entities';
+import { MyAnswerTreeDataProvider } from '@/bytelegend/my-answer-list-view';
 import * as vscode from 'vscode';
-import {TreeItem} from 'vscode';
-import {ByteLegendLogManager} from '@/bytelegend/bytelegendLogManager';
+import { TreeItem } from 'vscode';
+import { ByteLegendLogManager } from '@/bytelegend/bytelegendLogManager';
 import router from '@/router';
-import {initialVSCodeState} from '@/extension';
-import {runCatching} from '@/bytelegend/utils';
-import {TutorialsView} from '@/bytelegend/tutorials-view';
+import { initialVSCodeState } from '@/extension';
+import { runCatching } from '@/bytelegend/utils';
+import { TutorialsView } from '@/bytelegend/tutorials-view';
 
 /**
  * Router states:
@@ -76,7 +76,7 @@ export class ByteLegendContext {
 			(item, index, array) =>
 				this.toAnswerCommit(
 					item,
-					index == array.length - 1 ? null : array[index + 1].sha
+					index === array.length - 1 ? null : array[index + 1].sha
 				)
 		);
 		return new PullRequestAnswer(
@@ -192,9 +192,9 @@ export class ByteLegendContext {
 		if (
 			oldAnswers.length > 0 &&
 			newAnswers.length > 0 &&
-			oldAnswers[0].id == newAnswers[0].id &&
+			oldAnswers[0].id === newAnswers[0].id &&
 			oldAnswers[0].commits.length > 0 &&
-			newAnswers[0].commits.length == 0
+			newAnswers[0].commits.length === 0
 		) {
 			// when the PR is just created, check runs haven't started yet.
 			// otherwise we'll get an empty commit list
@@ -273,7 +273,7 @@ export class ByteLegendContext {
 		for (const item of this.whitelist) {
 			if (item.endsWith('/') && changedFilePath.startsWith(item)) {
 				return true;
-			} else if (item == changedFilePath) {
+			} else if (item === changedFilePath) {
 				return true;
 			}
 		}
@@ -287,7 +287,7 @@ export class ByteLegendContext {
 
 		if (
 			!new RegExp(`${this.repoFullName}/(tree|blob)/main`).test(
-				await this.getBrowserUrl()
+				await ByteLegendContext.getBrowserUrl()
 			) &&
 			!this.latestOpenPullRequestHtmlUrl
 		) {
@@ -314,7 +314,7 @@ export class ByteLegendContext {
 				changedFiles[filePath] = doc.getText();
 			});
 
-			if (changeFilePathsNotInWhitelist.length != 0) {
+			if (changeFilePathsNotInWhitelist.length !== 0) {
 				vscode.window.showErrorMessage(
 					this.getI18nText(
 						'ChangesAreNotAllowed',
@@ -367,7 +367,7 @@ export class ByteLegendContext {
 
 				const currentAnswers = this.answerTreeDataProvider.answers;
 				const samePullRequestAnswer = currentAnswers.find(
-					(item) => item.id == newPullRequestAnswerInResponse.id
+					(item) => item.id === newPullRequestAnswerInResponse.id
 				);
 				if (samePullRequestAnswer) {
 					samePullRequestAnswer.commits.unshift(
@@ -401,12 +401,10 @@ export class ByteLegendContext {
 	// {baseUrl}/ByteLegendQuest/java-fix-add/blob/main/src/main/java/com/bytelegend/Challenge.java ->
 	// {baseUrl}/ByteLegendQuest/java-fix-add/blob/{newBranch}/src/main/java/com/bytelegend/Challenge.java
 	private async switchToBranch(newBranch: string) {
-		const docs = vscode.workspace.textDocuments;
-
-		const oldUrl = await this.getBrowserUrl();
+		const oldUrl = await ByteLegendContext.getBrowserUrl();
 		const [newUrl, path] = this.replaceUrlWithNewBranch(oldUrl, newBranch);
 		console.log(`Switch to ${newUrl}`);
-		if (oldUrl == newUrl) {
+		if (oldUrl === newUrl) {
 			console.warn(`Can't switch to ${newBranch}: ${oldUrl}`);
 		} else {
 			await router.replace(newUrl);
@@ -414,7 +412,7 @@ export class ByteLegendContext {
 		}
 	}
 
-	private async getBrowserUrl(): Promise<string> {
+	private static async getBrowserUrl(): Promise<string> {
 		return (await vscode.commands.executeCommand(
 			'github1s.vscode.get-browser-url'
 		)) as string;
