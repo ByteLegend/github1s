@@ -1,7 +1,6 @@
 import * as vscode from 'vscode';
 import { Terminal } from 'vscode';
 import { ByteLegendContext } from '@/bytelegend/bytelegendContext';
-import { generateUuid } from '../../../../vscode-web-github1s/lib/vscode/src/vs/base/common/uuid';
 import { runCatching } from '@/bytelegend/utils';
 
 export class ByteLegendLogManager {
@@ -43,7 +42,7 @@ export class ByteLegendLogManager {
 	 * During this interval, we create a dummy log displaying the pending status.
 	 */
 	showPendingStatus(line: string): CheckRunLog {
-		return this.getOrCreateLog(`PendingStatus-${generateUuid()}`, 'Log', true)
+		return this.getOrCreateLog(`PendingStatus-${new Date().getTime()}`, 'Log', true)
 			.activate()
 			.startPendingStatus(line);
 	}
