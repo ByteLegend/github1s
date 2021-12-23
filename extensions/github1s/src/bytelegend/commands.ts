@@ -80,7 +80,6 @@ function parseByteLegendUri(uri: string): Uri {
 
 function buildByteLegendUri(owner: string, repo: string, ref: string, relativePathToRoot: string) {
 	const ret = Uri.parse(`github1s:/${relativePathToRoot}`)
-	console.log(repo, owner, byteLegendContext.getRepo(), byteLegendContext.getOwner())
 	if (repo == byteLegendContext.getRepo() && owner == byteLegendContext.getOwner()) {
 		// the target url exists in current repo, let's just open it!
 		return ret
