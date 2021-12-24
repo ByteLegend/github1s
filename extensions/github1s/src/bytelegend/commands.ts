@@ -103,7 +103,7 @@ function buildByteLegendUri(
 		return ret;
 	} else {
 		return ret.with({
-			authority: `${repo}+${owner}+${ref}`,
+			authority: `${owner}+${repo}+${ref}`,
 		});
 	}
 }
