@@ -181,6 +181,9 @@ export class ByteLegendContext {
 	}
 
 	getI18nText(key: string, ...args: string[]): string {
+		if (!this._initData) {
+			return key;
+		}
 		let template = this._initData.i18nTexts[key];
 		args.forEach(
 			(arg, index) => (template = template.replace(`{${index}}`, arg))
