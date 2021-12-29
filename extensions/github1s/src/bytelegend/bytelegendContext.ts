@@ -168,6 +168,10 @@ export class ByteLegendContext {
 		return this._initData?.apiServer || 'https://bytelegend.com';
 	}
 
+	get githubApiBaseUrl(): string {
+		return this._initData?.githubApiBaseUrl || 'https://ghapi.bytelegend.com';
+	}
+
 	get whitelist(): string {
 		return this._initData.whitelist;
 	}

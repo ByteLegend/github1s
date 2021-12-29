@@ -63,7 +63,8 @@ function isGitHubApi(url: string) {
 	return (
 		url.startsWith('https://api.github.com/') ||
 		new RegExp('http://localhost:\\d+/ghapi/').test(url) ||
-		url.startsWith('https://bytelegend.com/ghapi/')
+		url.startsWith('https://bytelegend.com/ghapi/') ||
+		url.startsWith('https://ghapi.bytelegend.com/')
 	);
 }
 
@@ -89,6 +90,7 @@ export const fetch = reuseable(async (url: string, options?: RequestInit) => {
 	try {
 		response = await self.fetch(url, {
 			mode: 'cors',
+			credentials: 'include',
 			...options,
 			headers: { ...authHeaders, ...customHeaders },
 		});

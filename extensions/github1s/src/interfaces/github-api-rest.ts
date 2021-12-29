@@ -20,18 +20,17 @@ export interface UriState {
 	path: string;
 }
 
-let apiServer = '';
+let gitHubApiServer = '';
 
-export async function getApiServer() {
-	if (apiServer == '') {
+async function getGitHubApiServer() {
+	if (gitHubApiServer === '') {
 		const initData: any = await vscode.commands.executeCommand(
 			'bytelegend.getInitData'
 		);
-		apiServer = initData
-			? `${initData.apiServer}/ghapi`
-			: 'https://api.github.com';
+		gitHubApiServer =
+			initData?.githubApiBaseUrl || 'https://bytelegend.com/ghapi/';
 	}
-	return apiServer;
+	return gitHubApiServer;
 }
 
 const handleFileSystemRequestError = (error: RequestError) => {
@@ -70,7 +69,7 @@ export const readGitHubDirectory = async (
 		return cached;
 	}
 	return fetch(
-		`${await getApiServer()}/repos/${owner}/${repo}/git/trees/${ref}${encodeFilePath(
+		`${await getGitHubApiServer()}/repos/${owner}/${repo}/git/trees/${ref}${encodeFilePath(
 			path
 		).replace(/^\//, ':')}`,
 		options
@@ -84,7 +83,7 @@ export async function readGitHubFile(
 	options?: RequestInit
 ) {
 	return fetch(
-		`${await getApiServer()}/repos/${owner}/${repo}/git/blobs/${fileSha}`,
+		`${await getGitHubApiServer()}/repos/${owner}/${repo}/git/blobs/${fileSha}`,
 		options
 	).catch(handleFileSystemRequestError);
 }
@@ -117,7 +116,7 @@ export async function getGitHubBranchRefs(
 	options?: RequestInit
 ) {
 	return fetch(
-		`${await getApiServer()}/repos/${owner}/${repo}/git/matching-refs/heads`,
+		`${await getGitHubApiServer()}/repos/${owner}/${repo}/git/matching-refs/heads`,
 		options
 	).then((branchRefs) => {
 		// the field in branchRef will looks like `refs/heads/<branch>`, we add a name field here
@@ -132,7 +131,7 @@ export async function getGitHubTagRefs(
 	options?: RequestInit
 ) {
 	return fetch(
-		`${await getApiServer()}/repos/${owner}/${repo}/git/matching-refs/tags`,
+		`${await getGitHubApiServer()}/repos/${owner}/${repo}/git/matching-refs/tags`,
 		options
 	).then((tagRefs) => {
 		// the field in tagRef will looks like `refs/tags/<tag>`, we add a name field here
@@ -147,7 +146,7 @@ export const getGitHubAllFiles = async (
 	path: string = '/'
 ) => {
 	const ret = await fetch(
-		`${await getApiServer()}/repos/${owner}/${repo}/git/trees/${ref}${encodeFilePath(
+		`${await getGitHubApiServer()}/repos/${owner}/${repo}/git/trees/${ref}${encodeFilePath(
 			path
 		).replace(/^\//, ':')}?recursive=1`
 	).catch(handleFileSystemRequestError);
@@ -166,7 +165,7 @@ export async function getGitHubPulls(
 ) {
 	// TODO: only recent 100 pull requests are supported now
 	return fetch(
-		`${await getApiServer()}/repos/${owner}/${repo}/pulls?state=all&order=created&per_page=${pageSize}&page=${pageNumber}`,
+		`${await getGitHubApiServer()}/repos/${owner}/${repo}/pulls?state=all&order=created&per_page=${pageSize}&page=${pageNumber}`,
 		options
 	);
 }
@@ -178,7 +177,7 @@ export async function getGitHubPullDetail(
 	options?: RequestInit
 ) {
 	return fetch(
-		`${await getApiServer()}/repos/${owner}/${repo}/pulls/${pullNumber}`,
+		`${await getGitHubApiServer()}/repos/${owner}/${repo}/pulls/${pullNumber}`,
 		options
 	);
 }
@@ -191,7 +190,7 @@ export async function getGitHubPullFiles(
 ) {
 	// TODO: only the number of change files not greater than 100 are supported now!
 	return fetch(
-		`${await getApiServer()}/repos/${owner}/${repo}/pulls/${pullNumber}/files?per_page=100`,
+		`${await getGitHubApiServer()}/repos/${owner}/${repo}/pulls/${pullNumber}/files?per_page=100`,
 		options
 	);
 }
@@ -205,7 +204,7 @@ export async function getGitHubCommits(
 	options?: ResponseInit
 ) {
 	return fetch(
-		`${await getApiServer()}/repos/${owner}/${repo}/commits?sha=${sha}&per_page=${pageSize}&page=${pageNumber}`,
+		`${await getGitHubApiServer()}/repos/${owner}/${repo}/commits?sha=${sha}&per_page=${pageSize}&page=${pageNumber}`,
 		options
 	);
 }
@@ -218,7 +217,7 @@ export async function getGitHubFileCommits(
 	options?: ResponseInit
 ) {
 	return fetch(
-		`${await getApiServer()}/repos/${owner}/${repo}/commits?path=${filePath.slice(1)}&sha=${sha}&per_page=100`, // prettier-ignore
+		`${await getGitHubApiServer()}/repos/${owner}/${repo}/commits?path=${filePath.slice(1)}&sha=${sha}&per_page=100`, // prettier-ignore
 		options
 	);
 }
@@ -230,7 +229,7 @@ export async function getGitHubCommitDetail(
 	options?: RequestInit
 ) {
 	return fetch(
-		`${await getApiServer()}/repos/${owner}/${repo}/commits/${commitSha}`,
+		`${await getGitHubApiServer()}/repos/${owner}/${repo}/commits/${commitSha}`,
 		options
 	);
 }
