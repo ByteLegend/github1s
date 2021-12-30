@@ -51,8 +51,8 @@ export async function activate(context: vscode.ExtensionContext) {
 	initialVSCodeState();
 
 	// Below is changed by ByteLegend
-	registerByteLegendCommands();
 	await byteLegendContext.init();
+	registerByteLegendCommands();
 	await registerByteLegendViews();
 	vscode.workspace.onDidOpenTextDocument((doc) => {
 		if (doc && doc.languageId === 'markdown') {

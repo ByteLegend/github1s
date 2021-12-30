@@ -109,7 +109,7 @@ export class PullRequestAnswer {
 			collapsibleState: TreeItemCollapsibleState.Collapsed,
 			command: {
 				title: 'showAnswerLog',
-				command: 'bytelegend.showAnswerLog',
+				command: 'bytelegend.openPrDescriptionAndShowAnswerLog',
 				arguments: [this.id],
 			},
 			contextValue,

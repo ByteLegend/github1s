@@ -69,6 +69,9 @@ function isGitHubApi(url: string) {
 }
 
 export const fetch = reuseable(async (url: string, options?: RequestInit) => {
+	options = options || {};
+	options.credentials = 'include';
+
 	const token = getOAuthToken();
 	const authHeaders =
 		token && isGitHubApi(url) ? { Authorization: `token ${token}` } : {};

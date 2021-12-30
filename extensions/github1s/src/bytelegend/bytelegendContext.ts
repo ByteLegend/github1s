@@ -22,6 +22,7 @@ export class ByteLegendContext {
 	);
 	private logManager = new ByteLegendLogManager(this);
 	private _initData: any;
+	private _activePullRequestUrl: string;
 
 	async init() {
 		this._initData = await vscode.commands.executeCommand(
@@ -169,7 +170,7 @@ export class ByteLegendContext {
 	}
 
 	get githubApiBaseUrl(): string {
-		return this._initData?.githubApiBaseUrl || 'https://ghapi.bytelegend.com';
+		return this._initData?.githubApiBaseUrl || 'https://bytelegend.com/ghapi';
 	}
 
 	get whitelist(): string {
@@ -207,6 +208,23 @@ export class ByteLegendContext {
 			// otherwise we'll get an empty commit list
 			return;
 		}
+
+		if (this._activePullRequestUrl) {
+			const oldAnswer = oldAnswers.find(
+				(a) => a.id == this._activePullRequestUrl
+			);
+			const newAnswer = newAnswers.find(
+				(a) => a.id == this._activePullRequestUrl
+			);
+			if (oldAnswer?.commits?.length !== newAnswer?.commits?.length) {
+				// Something has changed. We need to refresh.
+				vscode.commands.executeCommand(
+					'pr.refreshPullRequest',
+					this._activePullRequestUrl
+				);
+			}
+		}
+
 		await this.answerTreeDataProvider.updateTree(newAnswers);
 	}
 
@@ -228,7 +246,12 @@ export class ByteLegendContext {
 		}
 	}
 
-	async showAnswerLog(treeIdOrItem: TreeItem | string) {
+	async openPrDescription(prHtmlUrl: string): Promise<void> {
+		this._activePullRequestUrl = prHtmlUrl;
+		await vscode.commands.executeCommand('pr.openDescription', prHtmlUrl);
+	}
+
+	async showAnswerLog(treeIdOrItem: TreeItem | string): Promise<void> {
 		await this.showTerminal();
 		const nodeId =
 			typeof treeIdOrItem === 'string'
@@ -380,12 +403,19 @@ export class ByteLegendContext {
 					samePullRequestAnswer.commits.unshift(
 						newPullRequestAnswerInResponse.commits[0]
 					);
+					if (samePullRequestAnswer.htmlUrl == this._activePullRequestUrl) {
+						vscode.commands.executeCommand(
+							'pr.refreshPullRequest',
+							this._activePullRequestUrl
+						);
+					}
 				} else {
 					await this.switchToBranch(newPullRequestAnswerInResponse.branch);
+					this.openPrDescription(newPullRequestAnswerInResponse.htmlUrl);
 					currentAnswers.unshift(newPullRequestAnswerInResponse);
 				}
-				await this.answerTreeDataProvider.updateTree(currentAnswers);
-				await this.focusOnMyAnswerView();
+				this.answerTreeDataProvider.updateTree(currentAnswers);
+				this.focusOnMyAnswerView();
 
 				ByteLegendContext.setSubmitAnswerButton(true, 'CheckingAnswer');
 			}

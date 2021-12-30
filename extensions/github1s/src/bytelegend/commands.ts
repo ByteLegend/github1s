@@ -12,10 +12,19 @@ const commands: { id: string; callback: (...args: any[]) => any }[] = [
 	{ id: 'bytelegend.open', callback: open },
 	{ id: 'bytelegend.openVideoTutorial', callback: openVideoTutorial },
 	{ id: 'bytelegend.showAnswerLog', callback: showAnswerLog },
+	{
+		id: 'bytelegend.openPrDescriptionAndShowAnswerLog',
+		callback: openPrDescriptionAndShowAnswerLog,
+	},
 	{ id: 'bytelegend.openOnGitHub', callback: openOnGitHub },
 	{ id: 'bytelegend.appendLog', callback: appendLog },
 	{ id: 'bytelegend.submitAnswer', callback: submitAnswer },
+	{ id: 'bytelegend.getContext', callback: getContext },
 ];
+
+export function getContext() {
+	return byteLegendContext;
+}
 
 export const registerByteLegendCommands = () => {
 	const context = getExtensionContext();
@@ -124,6 +133,15 @@ async function openOnGitHub(treeItem: TreeItem) {
 			`https://github.com/${prAnswer.headRepoFullName}/commit/${treeItem.id}`
 		);
 	}
+}
+
+async function openPrDescriptionAndShowAnswerLog(prHtmlUrl: string) {
+	await runCatching(
+		Promise.all([
+			byteLegendContext.openPrDescription(prHtmlUrl),
+			byteLegendContext.showAnswerLog(prHtmlUrl),
+		])
+	);
 }
 
 async function showAnswerLog(nodeId: string) {

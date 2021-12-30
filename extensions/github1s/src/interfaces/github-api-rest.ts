@@ -24,11 +24,12 @@ let gitHubApiServer = '';
 
 async function getGitHubApiServer() {
 	if (gitHubApiServer === '') {
+		// Don't use getContext, it might not be initialized yet.
 		const initData: any = await vscode.commands.executeCommand(
 			'bytelegend.getInitData'
 		);
 		gitHubApiServer =
-			initData?.githubApiBaseUrl || 'https://bytelegend.com/ghapi/';
+			initData?.githubApiBaseUrl || 'https://bytelegend.com/ghapi';
 	}
 	return gitHubApiServer;
 }

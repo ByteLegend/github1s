@@ -1,0 +1,3 @@
+[submodule "extensions/vscode-pull-request-github"]
+	path = extensions/vscode-pull-request-github
+	url = https://github.com/ByteLegend/vscode-pull-request-github
