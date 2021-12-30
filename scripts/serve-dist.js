@@ -15,11 +15,18 @@ const proxyServer = httpProxy.createServer({
 });
 
 const handleProxyError = (error, req, res) => {
+	console.log(`Error when proxying ${req.url}`);
 	console.trace(error);
-	res.writeHead(500, {
-		'Content-Type': 'application/json',
-	});
-	res.end(JSON.stringify({ message: error.message }));
+	try {
+		res.writeHead(500, {
+			'Content-Type': 'application/json',
+		});
+		res.end(JSON.stringify({ message: error.message }));
+	} catch (e) {
+		// response might have already been written
+		// Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client
+		console.trace(e);
+	}
 };
 proxyServer.on('error', handleProxyError);
 
