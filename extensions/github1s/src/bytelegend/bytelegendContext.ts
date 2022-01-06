@@ -216,9 +216,12 @@ export class ByteLegendContext {
 			const newAnswer = newAnswers.find(
 				(a) => a.id == this._activePullRequestUrl
 			);
-			if (oldAnswer?.commits?.length !== newAnswer?.commits?.length ||
-				(oldAnswer?.commits?.length !== 0 && newAnswer?.commits?.length !== 0
-					&& oldAnswer.commits[0].conclusion != newAnswer.commits[0].conclusion)) {
+			if (
+				oldAnswer?.commits?.length !== newAnswer?.commits?.length ||
+				(oldAnswer?.commits?.length !== 0 &&
+					newAnswer?.commits?.length !== 0 &&
+					oldAnswer.commits[0].conclusion != newAnswer.commits[0].conclusion)
+			) {
 				// Something has changed. We need to refresh.
 				vscode.commands.executeCommand(
 					'pr.refreshPullRequest',
@@ -479,11 +482,13 @@ export class ByteLegendContext {
 		const init: RequestInit = {
 			method,
 			credentials: 'include',
+			headers: {
+				// forcibly preflight CORS request
+				'X-ByteLegend-From': 'github1s',
+			},
 		};
 		if (payload) {
-			init['headers'] = {
-				'Content-Type': 'application/json',
-			};
+			init['headers']['Content-Type'] = 'application/json';
 			init['body'] = JSON.stringify(payload);
 		}
 		const [err, response] = await runCatching(
