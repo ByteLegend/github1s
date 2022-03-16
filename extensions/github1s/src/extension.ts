@@ -51,7 +51,8 @@ export async function activate(context: vscode.ExtensionContext) {
 	initialVSCodeState();
 
 	// Below is changed by ByteLegend
-	await byteLegendContext.init();
+	// await byteLegendContext.init();
+	await initByteLegendContext();
 	registerByteLegendCommands();
 	await registerByteLegendViews();
 	vscode.workspace.onDidOpenTextDocument((doc) => {
@@ -64,6 +65,17 @@ export async function activate(context: vscode.ExtensionContext) {
 	await configureDefaultSettings();
 	await focusInitView();
 	await openInitReadme();
+}
+
+async function initByteLegendContext() {
+	const initData = await waitUntilFound(5000, async () => {
+		return vscode.commands.executeCommand('bytelegend.getInitData');
+	});
+	if (initData) {
+		await byteLegendContext.init(initData);
+	} else {
+		console.warn('Failed to get init data');
+	}
 }
 
 async function setUpActivityBar() {
@@ -161,24 +173,40 @@ In this method, when we want to open preview, we check if the markdown file is a
 and only preview if it's visible. If it's not visible, poll for at most 5 seconds.
  */
 async function openMarkdownPreview(initBrowserUrl: string, uri: Uri) {
-	const deadline = new Date().getTime() + 5000;
-	while (new Date().getTime() < deadline) {
+	const tabGroups = await waitUntilFound(5000, async () => {
 		const tabGroups: string[][] = await vscode.commands.executeCommand(
 			'bytelegend.getEditorTabGroups'
 		);
 		const flatTabs = Array.prototype.concat.apply([], tabGroups);
 		const fileName = getFileName(uri.path);
-		if (flatTabs.find((tab) => tab === fileName)) {
-			// we may have already fired `closeAllEditors` command, don't show the preview for the closed markdown tab
-			await doOpenPreview(initBrowserUrl, uri, tabGroups);
-			return;
+		return flatTabs.find((tab) => tab === fileName) ? tabGroups : null;
+	});
+	if (tabGroups) {
+		// 	we may have already fired `closeAllEditors` command, don't show the preview for the closed markdown tab
+		await doOpenPreview(initBrowserUrl, uri, tabGroups);
+	} else {
+		console.warn(
+			`Fail to get open tab matching ${uri.toString()}, skip opening preview.`
+		);
+	}
+}
+
+/**
+ * Wait until a non-null value is produced
+ */
+async function waitUntilFound<T>(
+	timeoutMs: number,
+	provider: () => Promise<T>
+) {
+	const deadline = new Date().getTime() + timeoutMs;
+	while (new Date().getTime() < deadline) {
+		const result = await provider();
+		if (result) {
+			return result;
 		}
 		await sleep(500);
 	}
-
-	console.warn(
-		`Fail to get open tab matching ${uri.toString()}, skip opening preview.`
-	);
+	return null;
 }
 
 async function doOpenPreview(

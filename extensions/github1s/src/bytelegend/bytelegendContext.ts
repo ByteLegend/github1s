@@ -24,10 +24,8 @@ export class ByteLegendContext {
 	private _initData: any;
 	private _activePullRequestUrl: string;
 
-	async init() {
-		this._initData = await vscode.commands.executeCommand(
-			'bytelegend.getInitData'
-		);
+	async init(initData: any) {
+		this._initData = initData;
 		await vscode.commands.executeCommand(
 			'bytelegend.postMessageToParentWindow',
 			{
