@@ -84,6 +84,7 @@ export class ByteLegendLogManager {
 			currentLog.stopPendingStatus();
 
 			if (err) {
+				// https://stackoverflow.com/questions/287871/how-to-print-colored-text-to-the-terminal
 				currentLog.appendLines(['\x1B[91m']);
 				currentLog.appendLines([err.toString()]);
 				currentLog.appendLines(['\x1B[0m']);
@@ -92,7 +93,6 @@ export class ByteLegendLogManager {
 				currentLog.appendLines([this.context.getI18nText('LogCleanedUp')]);
 				currentLog.appendLines(['\x1B[0m']);
 			} else if (logResponse.status > 399) {
-				// https://stackoverflow.com/questions/287871/how-to-print-colored-text-to-the-terminal
 				currentLog.appendLines(['\x1B[91m']);
 				currentLog.appendLines((await logResponse.text()).split(/\r?\n/));
 				currentLog.appendLines(['\x1B[0m']);

@@ -7,6 +7,8 @@ import router from '@/router';
 import { initialVSCodeState } from '@/extension';
 import { runCatching } from '@/bytelegend/utils';
 import { TutorialsView } from '@/bytelegend/tutorials-view';
+import repository from '@/repository';
+import { RepositoryRef } from '@/repository/types';
 
 /**
  * Router states:
@@ -23,9 +25,15 @@ export class ByteLegendContext {
 	private logManager = new ByteLegendLogManager(this);
 	private _initData: any;
 	private _activePullRequestUrl: string;
+	/**
+	 * The sha of main branch when the web editor is opened, or "origin/main" as a fallback.
+	 * This is used as "baseRef" when creating new pull requests.
+	 */
+	private mainBranchSha: string;
 
 	async init(initData: any) {
 		this._initData = initData;
+		this.mainBranchSha = await this.determineMainBranchSha();
 		await vscode.commands.executeCommand(
 			'bytelegend.postMessageToParentWindow',
 			{
@@ -53,6 +61,15 @@ export class ByteLegendContext {
 				await this.showAnswerLog(this._initData.liveLogs[0].id);
 			}
 		}
+	}
+
+	private async determineMainBranchSha() {
+		const branches: RepositoryRef[] = await repository.getBranches();
+		return (
+			branches.find((branch) => {
+				return branch?.name === 'main';
+			})?.object?.sha || 'origin/main'
+		);
 	}
 
 	// Adapt a Kotlin `PullRequestAnswer` to TypeScript `PullRequestAnswer`
@@ -209,16 +226,16 @@ export class ByteLegendContext {
 
 		if (this._activePullRequestUrl) {
 			const oldAnswer = oldAnswers.find(
-				(a) => a.id == this._activePullRequestUrl
+				(a) => a.id === this._activePullRequestUrl
 			);
 			const newAnswer = newAnswers.find(
-				(a) => a.id == this._activePullRequestUrl
+				(a) => a.id === this._activePullRequestUrl
 			);
 			if (
 				oldAnswer?.commits?.length !== newAnswer?.commits?.length ||
 				(oldAnswer?.commits?.length !== 0 &&
 					newAnswer?.commits?.length !== 0 &&
-					oldAnswer.commits[0].conclusion != newAnswer.commits[0].conclusion)
+					oldAnswer.commits[0].conclusion !== newAnswer.commits[0].conclusion)
 			) {
 				// Something has changed. We need to refresh.
 				vscode.commands.executeCommand(
@@ -364,6 +381,8 @@ export class ByteLegendContext {
 
 			if (this.latestOpenPullRequestHtmlUrl) {
 				payload['pullRequestHtmlUrl'] = this.latestOpenPullRequestHtmlUrl;
+			} else {
+				payload['baseRef'] = this.mainBranchSha;
 			}
 
 			const pendingStatusLog = this.logManager.showPendingStatus(
