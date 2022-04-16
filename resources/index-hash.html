@@ -126,11 +126,15 @@
 					whitelist: ${JSON.stringify(message.data.bytelegendInitData.whitelist)}
 					answers: ${JSON.stringify(message.data.bytelegendInitData.answers)}
 					initFocusView: ${message.data.bytelegendInitData.initFocusView}
+					tutorialsPrice: ${message.data.bytelegendInitData.tutorialsPrice}
 					initReadme: ${message.data.bytelegendInitData.initReadme}
 					`)
 				window.bytelegendInitData = message.data.bytelegendInitData;
 			}
 		});
+		if (window.parent) {
+			window.parent.postMessage({bytelegendEvent: 'webeditor.ready.for.init.data'}, '*');
+		}
 	</script>
 
 	<body aria-label="">
@@ -206,5 +210,4 @@
 				require(['vs/code/browser/workbench/workbench'], function () {});
 			});
 	</script>
-	<script src="https://unpkg.com/favicon-switcher@1.2.2/dist/index.js" crossorigin="anonymous" type="application/javascript" async="async"></script>
 </html>

@@ -156,6 +156,10 @@ export class ByteLegendContext {
 		return this._initData?.initReadme;
 	}
 
+	get tutorialsPrice(): number {
+		return this._initData?.tutorialsPrice;
+	}
+
 	get showActivityBar(): boolean {
 		return this._initData?.showActivityBar !== false;
 	}

@@ -44,15 +44,15 @@ export class TutorialsView implements vscode.WebviewViewProvider {
 	_getHtmlForWebview(webview): string {
 		const nonce = getNonce();
 
-		return `
+		const ret = `
 <!DOCTYPE html>
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<meta http-equiv="Content-Security-Policy" content="default-src localhost:8080 bytelegend.com; style-src 'nonce-${nonce}'; script-src 'nonce-${nonce}'; frame-src youtube.com www.youtube.com; img-src 'self' data:;">
+	<meta http-equiv="Content-Security-Policy" content="default-src *  data: blob: 'unsafe-inline'; style-src 'self' 'unsafe-inline'; script-src 'nonce-${nonce}'; frame-src youtube.com www.youtube.com; img-src 'self' data:;">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Tutorials</title>
-	<style nonce="${nonce}">
+	<style>
 html {
 	box-sizing: border-box;
 	font-size: 13px;
@@ -90,9 +90,10 @@ input {
 
 button {
 	border: none;
-	width: 100%;
+	width: 80%;
 	height: 26px;
-	margin-bottom: 10px;
+	margin-bottom: 5px;
+	margin-top: 5px;
 	padding: var(--input-padding-vertical) var(--input-padding-horizontal);
 	text-align: center;
 	outline: 1px solid transparent;
@@ -215,21 +216,75 @@ button.secondary:hover {
 	const videoIcon = 'data:image/svg+xml;base64,PHN2ZyBjbGFzcz0iaWNvbiIgdmlld0JveD0iMCAwIDEwMjQgMTAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCI+PHBhdGggZD0iTTY1OC4wNyAyNTZhNjQgNjQgMCAwIDEgNjQgNjRsLS4wMjIgMzMuNjY0IDQ5LjI4LTM4LjRhNjQgNjQgMCAwIDEgMTAzLjMzOSA1MC41MTdWNzA0LjE1YTY0IDY0IDAgMCAxLTEwMy4zMzkgNTAuNDc1bC00OS4yOC0zOC40djI2LjQ5NmE2NCA2NCAwIDAgMS02NCA2NEgyMTMuMzMzYTY0IDY0IDAgMCAxLTY0LTY0VjMyMGE2NCA2NCAwIDAgMSA2NC02NEg2NTguMDd6bTAgNjRIMjEzLjMzMnY0MjIuNjk5SDY1OC4wN2wtLjEyOC0xNTcuNTkgMTUyLjcyNiAxMTkuMDE5VjM2NS43Nkw2NTcuOTYzIDQ4NC42OTMgNjU4LjA2OSAzMjB6TTM4NCAzOTcuMzEyYTQyLjY2NyA0Mi42NjcgMCAwIDEgMjIuNzQxIDYuNTdsMTMzLjg2NyA4NC4zMzFhNDIuNjY3IDQyLjY2NyAwIDAgMSAuMzIgNzJMNDA3LjA2MSA2NDYuMjNhNDIuNjY3IDQyLjY2NyAwIDAgMS02NS43MjgtMzUuOTA0VjQzOS45OEE0Mi42NjcgNDIuNjY3IDAgMCAxIDM4NCAzOTcuMzEyem0yMS4zMzMgODEuMzIzdjkyLjYyOWw3Mi43OS00Ni43NjMtNzIuNzktNDUuODY2eiIgZmlsbD0iI2ZmZiIvPjwvc3ZnPg=='
 	const vscode = acquireVsCodeApi();
 
-	function updateTutorials(response) {
-	    response.json().then((json) => {
-	       	document.querySelector('.loading-page').style.display = 'none';
-			document.querySelector('.error-container').style.display = 'none';
-			const tutorialContainer = document.querySelector('.tutorials-container')
-			tutorialContainer.style.display = 'block';
-            if (json.items.length === 0) {
-				tutorialContainer.innerHTML = '<div>${this.bytelegendContext.getI18nText(
-					'NoTutorials'
-				)}</div>';
-            } else {
-				tutorialContainer.innerHTML = '';
-				tutorialContainer.appendChild(tutorialsToOl(json.items));
-			}
-	    }, onFetchingTutorialsError)
+	function updateTutorials(response, addNoEnoughCoinWarning) {
+		if (response.status === 402) {
+			addUnlockPrompt(addNoEnoughCoinWarning);
+		} else {
+			response.json().then((json) => {
+				const tutorialContainer = removeLoadingStatus();
+				if (json.items.length === 0) {
+					tutorialContainer.innerHTML = '<div>${this.bytelegendContext.getI18nText(
+						'NoTutorials'
+					)}</div>';
+				} else {
+					tutorialContainer.innerHTML = '';
+					tutorialContainer.appendChild(tutorialsToOl(json.items));
+				}
+			}, onFetchingTutorialsError)
+	    }
+	}
+
+	function addUnlockPrompt(addNoEnoughCoinWarning) {
+		const tutorialContainer = removeLoadingStatus();
+		tutorialContainer.innerHTML = '';
+
+		if(addNoEnoughCoinWarning) {
+			const noEnoughCoinDiv = document.createElement('div');
+			noEnoughCoinDiv.style.color = 'red';
+		    noEnoughCoinDiv.innerHTML = "${this.bytelegendContext.getI18nText(
+					'SorryYouDontHaveEnoughCoin'
+				)}";
+		    tutorialContainer.appendChild(noEnoughCoinDiv);
+		}
+
+		const div = document.createElement('div');
+		div.innerHTML = "${this.bytelegendContext.getI18nText(
+			'PayCoinToUnlockTutorialsInVSCode',
+			this.bytelegendContext.tutorialsPrice.toString()
+		)}";
+
+		const buttonDiv = document.createElement('div');
+		const button = document.createElement('button');
+		button.innerText = '${this.bytelegendContext.getI18nText('Unlock')}';
+		button.onclick = onUnlockButtonClicked;
+		buttonDiv.appendChild(button);
+
+		tutorialContainer.appendChild(div);
+		tutorialContainer.appendChild(buttonDiv);
+		return div;
+	}
+
+	function onUnlockButtonClicked() {
+		showLoadingStatus();
+		const url = '${this.bytelegendContext.apiServer}/game/api/mission/${
+			this.bytelegendContext.missionId
+		}/unlockTutorials?returnTutorials=true';
+
+		window.fetch(url, {method:'POST', credentials: 'include'}).then((response) => updateTutorials(response, true), onFetchingTutorialsError)
+	}
+
+	function showLoadingStatus() {
+		document.querySelector('.loading-page').style.display = 'block';
+		document.querySelector('.error-container').style.display = 'none';
+		document.querySelector('.tutorials-container').style.display = 'none';
+	}
+
+	function removeLoadingStatus() {
+		document.querySelector('.loading-page').style.display = 'none';
+		document.querySelector('.error-container').style.display = 'none';
+		const tutorialContainer = document.querySelector('.tutorials-container');
+		tutorialContainer.style.display = 'block';
+		return tutorialContainer;
 	}
 
 	function tutorialsToOl(tutorials) {
@@ -283,10 +338,11 @@ button.secondary:hover {
 	}
 
 	function getTutorials() {
-	  	window.fetch('${
-				this.bytelegendContext.apiServer
-			}/game/api/tutorials?missionId=${this.bytelegendContext.missionId}')
-	   		.then(updateTutorials, onFetchingTutorialsError)
+		const url = '${this.bytelegendContext.apiServer}/game/api/tutorials?missionId=${
+			this.bytelegendContext.missionId
+		}';
+	  	window.fetch(url, {credentials: 'include'})
+	   		.then((response) => updateTutorials(response, false), onFetchingTutorialsError)
 	}
 
 	getTutorials()
@@ -294,5 +350,6 @@ button.secondary:hover {
 </body>
 </html>
 		`;
+		return ret;
 	}
 }

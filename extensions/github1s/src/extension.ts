@@ -68,9 +68,9 @@ export async function activate(context: vscode.ExtensionContext) {
 }
 
 async function initByteLegendContext() {
-	const initData = await waitUntilFound(5000, async () => {
-		return vscode.commands.executeCommand('bytelegend.getInitData');
-	});
+	const initData = await vscode.commands.executeCommand(
+		'bytelegend.getInitData'
+	);
 	if (initData) {
 		await byteLegendContext.init(initData);
 	} else {
