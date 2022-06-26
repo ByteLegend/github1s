@@ -213,9 +213,11 @@ export class ByteLegendContext {
 
 	async updateAnswers(answers: any[]) {
 		const oldAnswers = this.answerTreeDataProvider.answers;
-		const newAnswers = answers.map((answer) =>
-			this.toTypeScriptPullRequestAnswer(answer)
-		);
+		const newAnswers = answers
+			.map((answer) => this.toTypeScriptPullRequestAnswer(answer))
+			// don't show forked PRs, because we might not able to push (player doesn't allow us)
+			.filter((answer) => answer.baseRepoFullName === answer.headRepoFullName);
+
 		if (
 			oldAnswers.length > 0 &&
 			newAnswers.length > 0 &&
